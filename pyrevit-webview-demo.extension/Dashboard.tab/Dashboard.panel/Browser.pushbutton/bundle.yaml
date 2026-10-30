@@ -1,0 +1,5 @@
+title: Browser
+tooltip: Dashboard opened in your browser (HTTP + Server-Sent Events bridge)
+
+engine:
+  clean: true

@@ -1,0 +1,53 @@
+name: Deploy UI to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pyrevit-webview-demo.extension/ui/**"
+      - ".github/workflows/pages.yml"
+  pull_request:
+    paths:
+      - "pyrevit-webview-demo.extension/ui/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: pyrevit-webview-demo.extension/ui
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: voidzero-dev/setup-vp@0072dab61af1caed438a55cb90c8d6dc0dfa09ce # v1.22.0
+        with:
+          node-version: "24"
+          run-install: false
+      - run: vp install --frozen-lockfile
+      - run: vp check
+      - run: vp build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: pyrevit-webview-demo.extension/ui/dist
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

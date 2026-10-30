@@ -1,0 +1,23 @@
+/**
+ * Semi Design owns component styling.
+ * Dark mode is body[theme-mode='dark'], toggled by ThemeProvider.
+ */
+
+body {
+  margin: 0;
+  color: var(--semi-color-text-0);
+  background-color: var(--semi-color-bg-0);
+}
+
+/* SideSheet title is flex: 1 0 auto, so a long name widens the sheet instead of wrapping. */
+.semi-sidesheet-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Collapse content inset matches the header. The default 16px plus the sheet padding squeezed the columns. */
+.semi-sidesheet .semi-collapse-content {
+  padding-right: 8px;
+  padding-left: 8px;
+}
