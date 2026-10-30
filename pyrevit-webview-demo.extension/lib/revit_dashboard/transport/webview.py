@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Transport 1: dashboard inside a WPF window hosting WebView2.
 
+The window navigates to the hosted page (GitHub Pages, or the Vite server in dev).
+
 Requests arrive through ``chrome.webview.postMessage``. Replies and events go
 back as a ``bim-bridge`` CustomEvent dispatched with ``ExecuteScriptAsync``.
 """
@@ -15,7 +17,6 @@ from pyrevit.script import get_logger
 from pyrevit_webview import EnvelopeField, event_message, parse_request
 from pyrevit_webview.adapter.revit import REVIT_CONTEXT
 from pyrevit_webview.host import (
-    PackagedContent,
     RemoteContent,
     WebViewControl,
     WebViewSession,
@@ -30,7 +31,6 @@ from revit_dashboard import config, singleton
 from revit_dashboard.service import DashboardService
 from revit_dashboard.windows import create_window
 
-_APP_HOST = "app.local"
 _ROW_CHUNK = 250
 
 log = get_logger()
@@ -152,12 +152,8 @@ def _write_workbook(payload):
 def _session():
     # type: () -> WebViewSession
     dev = config.dev_mode()
-    if dev:
-        content = RemoteContent(config.DEV_SERVER_URL)
-    else:
-        content = PackagedContent("https://{}/index.html".format(_APP_HOST), config.UI_DIST)
     return WebViewSession(
-        content,
+        RemoteContent(config.page_url()),
         app_name="RevitDashboard",
         debug_cdp_port=config.DEV_CDP_PORT if dev else None,
         settings=WebViewSettings(dev_tools_enabled=dev),

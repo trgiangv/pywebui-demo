@@ -2,7 +2,7 @@
  * Bridge client. One JSON envelope, three ways to carry it:
  *
  * - webview: chrome.webview.postMessage / `bim-bridge` CustomEvent (Revit WebView2 window)
- * - http:    POST /api/invoke + EventSource /api/events (Revit served to a normal browser)
+ * - http:    POST /api/invoke + EventSource /api/events on a Revit session (page hosted elsewhere)
  * - mock:    in-page fake data (plain browser, no Revit)
  *
  * The constructor does not subscribe; call start() from a provider effect.
@@ -19,6 +19,7 @@ import { buildDashboard, toDashboardPayload } from "./analytics"
 import { DASHBOARD_EVENT, EnvelopeField, EnvelopeKind } from "./envelope"
 import { displayText } from "./text"
 import { generateMockPayload } from "./mock-data"
+import { checkSession, readSession, type RevitSession } from "./session"
 
 type SaveFilePicker = (options: {
   suggestedName?: string
@@ -27,20 +28,8 @@ type SaveFilePicker = (options: {
 
 type BridgeMode = "webview" | "http" | "mock"
 
-const HTTP_INVOKE_URL = "/api/invoke"
-const HTTP_EVENTS_URL = "/api/events"
-
-/** The Python HTTP host injects `__BIM_BRIDGE__`; the Vite dev page is told with `?bridge=http`. */
-function detectMode(): BridgeMode {
-  if (window.chrome?.webview || window.__BIM_DASHBOARD_INITIAL_DATA) return "webview"
-  const requested = new URLSearchParams(window.location.search).get("bridge")
-  if (window.__BIM_BRIDGE__ === "http" || requested === "http") return "http"
-  return "mock"
-}
-
 declare global {
   interface Window {
-    __BIM_BRIDGE__?: "http"
     __BIM_DASHBOARD_INITIAL_DATA?: unknown
     chrome?: {
       webview?: ChromeWebView
@@ -134,6 +123,8 @@ export class BridgeClient {
   private readonly pending = new Map<string, PendingRequest>()
   private readonly selectionListeners = new Set<SelectionListener>()
   private readonly mode: BridgeMode
+  private readonly session: RevitSession | null
+  private compatible: Promise<void> | null = null
   private eventSource: EventSource | null = null
   private mockPayload: DashboardPayload | null = null
   private messageListener: ((event: { data: unknown }) => void) | null = null
@@ -143,7 +134,10 @@ export class BridgeClient {
   private readonly chunkedReply = new Map<string, Record<string, unknown>>()
 
   constructor() {
-    this.mode = detectMode()
+    const webview = window.chrome?.webview || window.__BIM_DASHBOARD_INITIAL_DATA
+    this.session = webview ? null : readSession()
+    if (webview) this.mode = "webview"
+    else this.mode = this.session ? "http" : "mock"
     console.log(`[Bridge] mode: ${this.mode}`)
     if (this.mode === "mock") this.mockPayload = generateMockPayload(2500)
   }
@@ -154,9 +148,10 @@ export class BridgeClient {
    */
   start(): () => void {
     if (this.messageListener) return () => this.stop()
-    if (this.mode === "http") {
+    if (this.session) {
       this.messageListener = () => {}
-      this.eventSource = new EventSource(HTTP_EVENTS_URL)
+      const { base, token } = this.session
+      this.eventSource = new EventSource(`${base}/api/events?token=${encodeURIComponent(token)}`)
       this.eventSource.onmessage = (event) => this.onMessage(event.data)
       return () => this.stop()
     }
@@ -250,10 +245,14 @@ export class BridgeClient {
 
   /** HTTP carries the response in the POST reply; it re-enters the same path as a WebView2 reply. */
   private async postHttp(id: string, message: BridgeMessage): Promise<void> {
+    const session = this.session
+    if (!session) return this.failPending(id, "No Revit session")
     try {
-      const res = await fetch(HTTP_INVOKE_URL, {
+      this.compatible ??= checkSession(session)
+      await this.compatible
+      const res = await fetch(`${session.base}/api/invoke`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-Bim-Token": session.token },
         body: JSON.stringify(message),
       })
       const body: unknown = await res.json().catch(() => null)
@@ -261,6 +260,7 @@ export class BridgeClient {
       const detail = (body as { error?: string } | null)?.error ?? `HTTP ${res.status}`
       this.failPending(id, detail)
     } catch (error) {
+      this.compatible = null // retry the handshake next time
       this.failPending(id, error instanceof Error ? error.message : "Request failed")
     }
   }

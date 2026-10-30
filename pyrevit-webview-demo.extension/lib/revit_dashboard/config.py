@@ -1,29 +1,40 @@
 # -*- coding: utf-8 -*-
-"""Paths and switches shared by both hosts (WebView2 and browser)."""
+"""Addresses and switches shared by both hosts (WebView2 and browser).
+
+The UI is not shipped with the tool. A release opens the page hosted on GitHub
+Pages; the page talks back to this Revit session.
+"""
 
 from __future__ import division, print_function
 
 import os
 
-_LIB_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-EXTENSION_DIR = os.path.dirname(_LIB_DIR)  # type: str
-UI_DIR = os.path.join(EXTENSION_DIR, "ui")  # type: str
-UI_DIST = os.path.join(UI_DIR, "dist")  # type: str
-
+PAGES_URL = "https://trgiangv.github.io/pyrevit-webview-demo/"  # type: str
 DEV_SERVER_URL = "http://localhost:5173"  # type: str
 DEV_CDP_PORT = 9225  # type: int
-HTTP_PORT = 8765  # type: int
+
+# Bumped when the request/response contract changes. The page checks it against
+# /api/health and refuses to talk to a tool it does not understand.
+PROTOCOL = 1  # type: int
+
+# One Revit session binds the first free port of the range.
 HTTP_HOST = "127.0.0.1"  # type: str
+HTTP_PORTS = tuple(range(8765, 8775))  # type: tuple[int, ...]
 
 
 def dev_mode():
     # type: () -> bool
-    """True serves the page from the Vite dev server.
+    """True opens the Vite dev server instead of GitHub Pages (``REVIT_DASHBOARD_DEV=1``)."""
+    return os.environ.get("REVIT_DASHBOARD_DEV", "").strip().lower() in ("1", "true", "yes")
 
-    ``REVIT_DASHBOARD_DEV=1`` / ``0`` forces it. Otherwise dev mode is on only
-    when ``ui/dist`` has not been built.
-    """
-    flag = os.environ.get("REVIT_DASHBOARD_DEV")
-    if flag is not None:
-        return flag.strip().lower() in ("1", "true", "yes")
-    return not os.path.isfile(os.path.join(UI_DIST, "index.html"))
+
+def page_url():
+    # type: () -> str
+    return DEV_SERVER_URL if dev_mode() else PAGES_URL
+
+
+def page_origin():
+    # type: () -> str
+    """Scheme and host of the page, as a browser sends it in ``Origin``."""
+    parts = page_url().split("/")
+    return "/".join(parts[:3])
