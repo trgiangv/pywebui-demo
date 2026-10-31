@@ -9,6 +9,7 @@ Revit runs here, on the Revit thread, through ``REVIT_CONTEXT.post``.
 from __future__ import division, print_function
 
 import threading
+import traceback
 
 from pyrevit import DB
 
@@ -21,7 +22,7 @@ from pyrevit_webview import (
 from pyrevit_webview.adapter.revit import REVIT_CONTEXT
 
 from pyrevit import HOST_APP
-from pyrevit.script import get_logger
+from revit_dashboard.log import get_logger
 from revit_dashboard.revit_api.handler import RevitApiHandler
 
 _LATEST_COMMANDS = ["ColorOverride", "Isolate", "ApplyGroupOverrides"]
@@ -97,7 +98,7 @@ class DashboardService(object):
                 result = self._api.run(command, parsed.payload)
             self._sink.send(response_message(command, parsed.id, payload=result))
         except Exception as exc:
-            log.error("command {} failed: {}".format(command, exc))
+            log.error("command {} failed: {}\n{}".format(command, exc, traceback.format_exc()))
             self._sink.send(response_message(command, parsed.id, error=str(exc)))
 
     # -- events -----------------------------------------------------------

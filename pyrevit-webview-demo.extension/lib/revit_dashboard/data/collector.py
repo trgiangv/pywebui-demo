@@ -3,6 +3,8 @@
 
 from __future__ import division, print_function
 
+import traceback
+
 from pyrevit import DB
 
 from revit_dashboard.constants import (
@@ -15,7 +17,7 @@ from revit_dashboard.constants import (
     MISSING_WORKSET,
 )
 from revit_dashboard.data.categories import get_model_categories
-from pyrevit.script import get_logger
+from revit_dashboard.log import get_logger
 
 log = get_logger()
 
@@ -107,11 +109,22 @@ def _collect_category(doc, category, levels, phases, extra_parameters, types):
         return []
 
     rows = []
+    failed = 0
     for element in collector:
         try:
             rows.append(_to_row(doc, element, levels, phases, extra_parameters, types))
-        except Exception as ex:
-            log.warning("skip element {}: {}".format(element.Id.ToString(), ex))
+        except Exception:
+            failed += 1
+            if failed <= 3:  # the first few tell the cause; the rest repeat it
+                log.warning(
+                    "skip element {} in {}:\n{}".format(
+                        element.Id.ToString(), category, traceback.format_exc()
+                    )
+                )
+    if failed:
+        log.warning("category {}: {} rows, {} skipped".format(category, len(rows), failed))
+    else:
+        log.debug("category {}: {} rows".format(category, len(rows)))
     return rows
 
 

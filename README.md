@@ -54,6 +54,10 @@ Release: reload pyRevit and click a button; nothing to build locally.
   shows an error if they differ. Bump both when the request contract changes.
 - The server answers CORS for the page's origin only and requires the token on `/api/invoke`
   and `/api/events`. Chrome may ask permission for the page to reach the local network.
+## Logs
+
+The dashboard writes to `%TEMP%\revit_dashboard.log` (and stdout). After a button script returns, pyRevit no longer shows stdout, so use the file. `REVIT_DASHBOARD_LOG=DEBUG` adds per-category counts.
+
 ## CI
 
 `.github/workflows/pages.yml` runs `vp check` and `vp build` with `voidzero-dev/setup-vp`

@@ -39,7 +39,7 @@ from pyrevit.compat import NETCORE
 
 # pyrevit does not load HttpListener: System.Net.HttpListener.dll on .NET 8, System.dll on Framework.
 clr.AddReference("System.Net.HttpListener" if NETCORE else "System")
-from pyrevit.script import get_logger
+from revit_dashboard.log import get_logger
 from pyrevit_webview import EnvelopeField, EnvelopeKind, parse_request
 from pyrevit_webview.adapter.revit import REVIT_CONTEXT
 from pyrevit_webview.serialize import serialize

@@ -13,7 +13,7 @@ import os
 import traceback
 
 from pyrevit import HOST_APP, forms
-from pyrevit.script import get_logger
+from revit_dashboard.log import get_logger
 from pyrevit_webview import EnvelopeField, event_message, parse_request
 from pyrevit_webview.adapter.revit import REVIT_CONTEXT
 from pyrevit_webview.host import (

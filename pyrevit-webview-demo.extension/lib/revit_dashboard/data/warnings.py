@@ -10,7 +10,7 @@ from __future__ import division, print_function
 from pyrevit import DB
 from System.Collections.Generic import ICollection, IList
 
-from pyrevit.script import get_logger
+from revit_dashboard.log import get_logger
 
 log = get_logger()
 

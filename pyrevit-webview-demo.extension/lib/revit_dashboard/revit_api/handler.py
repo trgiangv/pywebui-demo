@@ -14,7 +14,7 @@ from pyrevit_webview.serialize import JsonValue
 from System.Collections.Generic import List
 
 from pyrevit import HOST_APP
-from pyrevit.script import get_logger
+from revit_dashboard.log import get_logger
 
 log = get_logger()
 from revit_dashboard.data.collector import collect_model_elements, collect_model_info
