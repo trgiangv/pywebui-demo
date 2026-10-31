@@ -198,13 +198,14 @@ def _revit_name(element):
     """Read ``Element.Name``.
 
     IronPython 2.7 raises ``AttributeError`` when a subclass hides that
-    property (``ElementType``, ``SpatialElement``). The base getter still
-    returns the name. CPython and IronPython 3 take the first branch.
+    property (``ElementType``, ``SpatialElement``). ``DB.Element.Name`` is then
+    a plain Python descriptor on the base class, so its ``__get__`` returns the
+    name. CPython and IronPython 3 take the first branch.
     """
     try:
         name = element.Name
     except AttributeError:
-        name = DB.Element.Name.GetValue(element)
+        name = DB.Element.Name.__get__(element, DB.Element)
     return name or ""
 
 
