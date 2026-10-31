@@ -8,7 +8,7 @@
     "~/AppData/Roaming/pyRevit-Master/pyrevitlib",
     "~/AppData/Roaming/pyRevit-Master/site-packages",
     "~/AppData/Roaming/RevitDevTool/2025/Stubs",
-    "C:/Users/truon/source/repos/pyrevit-webview",
+    "C:/Users/truon/AppData/Roaming/pyRevit/Extensions/pyrevit_webview.lib",
     "${workspaceFolder}/pyrevit-webview-demo.extension/lib"
   ]
 }
