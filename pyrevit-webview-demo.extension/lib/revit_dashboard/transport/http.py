@@ -53,7 +53,7 @@ from System.Windows.Controls import Button, StackPanel, TextBlock
 from System.Windows.Threading import DispatcherTimer
 
 from revit_dashboard import config, singleton
-from revit_dashboard.service import DashboardService
+from revit_dashboard.service import DashboardService, EnvelopeSink
 from revit_dashboard.windows import create_window
 
 _REQUEST_TIMEOUT = 300.0
@@ -63,7 +63,7 @@ _TOKEN_HEADER = "X-Bim-Token"
 log = get_logger()
 
 
-class HttpSink(object):
+class HttpSink(EnvelopeSink):
     """Routes responses to the waiting HTTP request and events to SSE clients."""
 
     def __init__(self):

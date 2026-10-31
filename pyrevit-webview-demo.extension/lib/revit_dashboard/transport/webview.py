@@ -28,7 +28,7 @@ from System import Convert
 from System.IO import File
 
 from revit_dashboard import config, singleton
-from revit_dashboard.service import DashboardService
+from revit_dashboard.service import DashboardService, EnvelopeSink
 from revit_dashboard.windows import create_window
 
 _ROW_CHUNK = 250
@@ -36,7 +36,7 @@ _ROW_CHUNK = 250
 log = get_logger()
 
 
-class WebViewSink(object):
+class WebViewSink(EnvelopeSink):
     """Delivers envelopes to the page. Large ``rows`` go out in chunks."""
 
     def __init__(self):

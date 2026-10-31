@@ -11,7 +11,8 @@ from __future__ import division, print_function
 import threading
 import traceback
 
-from pyrevit import DB
+from Autodesk.Revit.UI.Events import SelectionChangedEventArgs
+from pyrevit import DB, UI
 
 from pyrevit_webview import (
     CommandRequest,
@@ -20,6 +21,9 @@ from pyrevit_webview import (
     response_message,
 )
 from pyrevit_webview.adapter.revit import REVIT_CONTEXT
+from pyrevit_webview.bridge.envelope import Envelope
+from pyrevit_webview.compat import Callable, Dict, Optional, Tuple
+from pyrevit_webview.serialize import JsonValue
 
 from revit_dashboard.log import get_logger
 from revit_dashboard.revit_api.handler import RevitApiHandler
@@ -27,6 +31,14 @@ from revit_dashboard.revit_api.handler import RevitApiHandler
 _LATEST_COMMANDS = ["ColorOverride", "Isolate", "ApplyGroupOverrides"]
 
 log = get_logger()
+
+
+class EnvelopeSink(object):
+    """Where the service delivers responses and events. One subclass per host."""
+
+    def send(self, message):
+        # type: (Envelope) -> None
+        raise NotImplementedError
 
 
 class DashboardService(object):
@@ -40,14 +52,14 @@ class DashboardService(object):
     """
 
     def __init__(self, sink, extra_commands=None):
-        # type: (object, dict | None) -> None
+        # type: (EnvelopeSink, Optional[Dict[str, Callable[[Dict[str, JsonValue]], Optional[JsonValue]]]]) -> None
         self._sink = sink
         self._api = RevitApiHandler()
         self._extra = extra_commands or {}
         self._pending = []  # type: list[CommandRequest]
         self._running = False
         self._lock = threading.Lock()
-        self._selection_sub = None
+        self._selection_sub = None  # type: Optional[Tuple[UI.UIApplication, Callable[[UI.UIApplication, SelectionChangedEventArgs], None]]]
 
     # -- requests ---------------------------------------------------------
 
