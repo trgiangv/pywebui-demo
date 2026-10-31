@@ -3,7 +3,7 @@
 
 from __future__ import division, print_function
 
-from pyrevit import HOST_APP
+from pyrevit_webview.adapter.revit import REVIT_CONTEXT
 from System.Windows import ResizeMode, SizeToContent, Window, WindowStartupLocation
 from System.Windows.Interop import WindowInteropHelper
 
@@ -20,5 +20,5 @@ def create_window(title, width, height=None):
     else:
         window.Height = height
     window.WindowStartupLocation = WindowStartupLocation.CenterScreen
-    WindowInteropHelper(window).Owner = HOST_APP.proc_window
+    WindowInteropHelper(window).Owner = REVIT_CONTEXT.main_window
     return window

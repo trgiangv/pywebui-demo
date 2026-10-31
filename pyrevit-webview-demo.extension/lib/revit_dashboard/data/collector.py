@@ -6,6 +6,7 @@ from __future__ import division, print_function
 import traceback
 
 from pyrevit import DB
+from pyrevit_webview.adapter.revit import REVIT_CONTEXT
 
 from revit_dashboard.constants import (
     EXTRA_PARAMETERS,
@@ -25,13 +26,12 @@ log = get_logger()
 def collect_model_info(doc):
     # type: (DB.Document) -> dict[str, str | int]
     """Collect filename, path, active view, and view/sheet counts."""
-    from pyrevit import HOST_APP
-
+    
     file_name = doc.Title or "Untitled"
     file_path = doc.PathName or ""
 
     current_view = ""
-    active_view = HOST_APP.uidoc.ActiveView  # type: DB.View
+    active_view = REVIT_CONTEXT.uidoc.ActiveView  # type: DB.View
     if active_view is not None:
         current_view = active_view.Name or ""
 

@@ -3,5 +3,5 @@
 
 from revit_dashboard.transport.webview import show_dashboard
 
-show_dashboard()
+show_dashboard(__revit__)
 

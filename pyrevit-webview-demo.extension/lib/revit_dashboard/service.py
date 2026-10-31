@@ -21,7 +21,6 @@ from pyrevit_webview import (
 )
 from pyrevit_webview.adapter.revit import REVIT_CONTEXT
 
-from pyrevit import HOST_APP
 from revit_dashboard.log import get_logger
 from revit_dashboard.revit_api.handler import RevitApiHandler
 
@@ -116,12 +115,12 @@ class DashboardService(object):
         if self._selection_sub is not None:
             return
         try:
-            uiapp = HOST_APP.uiapp
+            uiapp = REVIT_CONTEXT.uiapp
 
             def on_selection_changed(sender, event_args):
                 try:
                     ids = []
-                    for eid in HOST_APP.uidoc.Selection.GetElementIds():
+                    for eid in REVIT_CONTEXT.uidoc.Selection.GetElementIds():
                         if not eid.Equals(DB.ElementId.InvalidElementId):
                             ids.append(eid.ToString())
                     self._sink.send(event_message("selection-changed", {"element_ids": ids}))

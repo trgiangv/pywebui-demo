@@ -12,7 +12,7 @@ from __future__ import division, print_function
 import os
 import traceback
 
-from pyrevit import HOST_APP, forms
+from pyrevit import forms
 from revit_dashboard.log import get_logger
 from pyrevit_webview import EnvelopeField, event_message, parse_request
 from pyrevit_webview.adapter.revit import REVIT_CONTEXT
@@ -81,8 +81,8 @@ class WebViewSink(object):
             log.error("emit failed ({} chars): {}".format(len(script), exc))
 
 
-def show_dashboard():
-    # type: () -> None
+def show_dashboard(uiapp):
+    # type: (UIApplication) -> None
     """Open one modeless dashboard window, or activate the existing one."""
     active = singleton.get("webview_window")
     if active is not None:
@@ -92,7 +92,7 @@ def show_dashboard():
         except Exception:
             singleton.put("webview_window", None)
 
-    REVIT_CONTEXT.initialize(HOST_APP.uiapp)
+    REVIT_CONTEXT.initialize(uiapp)
 
     try:
         sink = WebViewSink()

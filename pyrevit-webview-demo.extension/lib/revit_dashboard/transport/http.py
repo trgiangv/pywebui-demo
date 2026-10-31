@@ -34,7 +34,7 @@ except ImportError:
 import clr
 
 # pyrevit first: it loads the WPF assemblies the System.Windows imports below need.
-from pyrevit import HOST_APP, forms
+from pyrevit import forms
 from pyrevit.compat import NETCORE
 
 # pyrevit does not load HttpListener: System.Net.HttpListener.dll on .NET 8, System.dll on Framework.
@@ -146,7 +146,7 @@ class DashboardHttpServer(object):
             "transport": "http",
             "protocol": config.PROTOCOL,
             "pid": os.getpid(),
-            "revit": HOST_APP.version,
+            "revit": REVIT_CONTEXT.version,
         })
         _spawn(self._accept_loop)
         self.service.subscribe()
@@ -298,8 +298,8 @@ def _open_browser(url):
     Process.Start(info)
 
 
-def show_dashboard():
-    # type: () -> None
+def show_dashboard(uiapp):
+    # type: (UIApplication) -> None
     """Open the connection window. It owns the HTTP server: closing it stops the bridge."""
     existing = singleton.get("http_window")
     if existing is not None:
@@ -311,7 +311,7 @@ def show_dashboard():
 
     server = DashboardHttpServer()
     try:
-        REVIT_CONTEXT.initialize(HOST_APP.uiapp)
+        REVIT_CONTEXT.initialize(uiapp)
         server.start()
         window = _build_window(server)
         window.Show()
@@ -345,7 +345,7 @@ def _build_window(server):
     panel.Margin = Thickness(16)
     for child in (
         status,
-        label("Revit {}  |  PID {}  |  port {}".format(HOST_APP.version, os.getpid(), server.port), 12),
+        label("Revit {}  |  PID {}  |  port {}".format(REVIT_CONTEXT.version, os.getpid(), server.port), 12),
         label("Keep this window open. Closing it disconnects the browser.", 12, wrap=True),
         button,
     ):

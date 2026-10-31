@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Revit API command bodies for the dashboard.
 
-Do not use a cached document. Read ``HOST_APP.doc`` at call time.
+Do not use a cached document. Read ``REVIT_CONTEXT.doc`` at call time.
 ``with Transaction`` is the form this package already runs under pythonnet.
 Temporary view modes still need a transaction.
 """
@@ -9,17 +9,17 @@ Temporary view modes still need a transaction.
 from __future__ import division, print_function
 
 from pyrevit import DB
+from pyrevit_webview.adapter.revit import REVIT_CONTEXT
 from pyrevit_webview.compat import Callable
 from pyrevit_webview.serialize import JsonValue
 from System.Collections.Generic import List
 
-from pyrevit import HOST_APP
 from revit_dashboard.log import get_logger
 
-log = get_logger()
 from revit_dashboard.data.collector import collect_model_elements, collect_model_info
 from revit_dashboard.data.warnings import collect_warnings
 
+log = get_logger()
 
 def _run_transaction(doc, name, action):
     # type: (DB.Document, str, Callable[[], None]) -> None
@@ -128,10 +128,10 @@ class RevitApiHandler(object):
     def _cmd_get_snapshot(self, _params):
         # type: (dict[str, JsonValue]) -> dict[str, JsonValue]
         log.info("collecting snapshot")
-        rows = collect_model_elements(HOST_APP.doc)
+        rows = collect_model_elements(REVIT_CONTEXT.doc)
         log.info("collected {} model elements".format(len(rows)))
-        model_info = collect_model_info(HOST_APP.doc)
-        warnings = collect_warnings(HOST_APP.doc)
+        model_info = collect_model_info(REVIT_CONTEXT.doc)
+        warnings = collect_warnings(REVIT_CONTEXT.doc)
         log.info("found {} warnings".format(len(warnings)))
         return {
             "model_info": model_info,
@@ -143,15 +143,15 @@ class RevitApiHandler(object):
         # type: (dict[str, JsonValue]) -> None
         ids = self._resolve_ids(params)
         if ids:
-            HOST_APP.uidoc.Selection.SetElementIds(ids)
+            REVIT_CONTEXT.uidoc.Selection.SetElementIds(ids)
             log.info("selected {} elements".format(ids.Count))
 
     def _cmd_zoom(self, params):
         # type: (dict[str, JsonValue]) -> None
         ids = self._resolve_ids(params)
         if ids:
-            HOST_APP.uidoc.Selection.SetElementIds(ids)
-            HOST_APP.uidoc.ShowElements(ids)
+            REVIT_CONTEXT.uidoc.Selection.SetElementIds(ids)
+            REVIT_CONTEXT.uidoc.ShowElements(ids)
             log.info("zoomed to {} elements".format(ids.Count))
 
     def _cmd_isolate(self, params):
@@ -165,7 +165,7 @@ class RevitApiHandler(object):
                 view.DisableTemporaryViewMode(DB.TemporaryViewMode.TemporaryHideIsolate)
                 view.IsolateElementsTemporary(ids)
 
-            _run_transaction(HOST_APP.doc, "Isolate Elements", action)
+            _run_transaction(REVIT_CONTEXT.doc, "Isolate Elements", action)
             log.info("isolated {} elements".format(ids.Count))
 
     def _cmd_reset_isolation(self, _params):
@@ -176,7 +176,7 @@ class RevitApiHandler(object):
             # type: () -> None
             view.DisableTemporaryViewMode(DB.TemporaryViewMode.TemporaryHideIsolate)
 
-        _run_transaction(HOST_APP.doc, "Reset Isolation", action)
+        _run_transaction(REVIT_CONTEXT.doc, "Reset Isolation", action)
         log.info("reset isolation")
 
     def _cmd_color_override(self, params):
@@ -193,13 +193,13 @@ class RevitApiHandler(object):
                 for index in range(ids.Count):
                     view.SetElementOverrides(ids[index], override)
 
-            _run_transaction(HOST_APP.doc, "Color Override", action)
+            _run_transaction(REVIT_CONTEXT.doc, "Color Override", action)
             log.info("color override on {} elements".format(ids.Count))
 
     def _cmd_clear_overrides(self, _params):
         # type: (dict[str, JsonValue]) -> None
         view = self._active_view()
-        doc = HOST_APP.doc
+        doc = REVIT_CONTEXT.doc
         collector = DB.FilteredElementCollector(doc, view.Id).WhereElementIsNotElementType()
         default = DB.OverrideGraphicSettings()
 
@@ -216,7 +216,7 @@ class RevitApiHandler(object):
         """Isolate elements matching a level name and category name."""
         level_name = params.get("level", "")
         category_name = params.get("category", "")
-        doc = HOST_APP.doc
+        doc = REVIT_CONTEXT.doc
         view = self._active_view()
 
         def reset_action():
@@ -242,8 +242,8 @@ class RevitApiHandler(object):
             view.DisableTemporaryViewMode(DB.TemporaryViewMode.TemporaryHideIsolate)
             view.IsolateElementsTemporary(ids)
 
-        _run_transaction(HOST_APP.doc, "Warning View", action)
-        HOST_APP.uidoc.Selection.SetElementIds(ids)
+        _run_transaction(REVIT_CONTEXT.doc, "Warning View", action)
+        REVIT_CONTEXT.uidoc.Selection.SetElementIds(ids)
         log.info("warning view isolates {} elements".format(ids.Count))
 
     def _cmd_apply_group_overrides(self, params):
@@ -253,7 +253,7 @@ class RevitApiHandler(object):
         ``groups`` is a list of ``{element_ids, color}``.
         ``isolate_ids`` isolates those ids when it is a non-empty list.
         """
-        doc = HOST_APP.doc
+        doc = REVIT_CONTEXT.doc
         view = self._active_view()
         groups = params.get("groups", [])
         isolate_ids_raw = params.get("isolate_ids")
@@ -291,7 +291,7 @@ class RevitApiHandler(object):
         # type: (dict[str, JsonValue]) -> None
         """Clear temporary isolation and graphic overrides."""
         view = self._active_view()
-        doc = HOST_APP.doc
+        doc = REVIT_CONTEXT.doc
 
         def action():
             # type: () -> None
@@ -310,7 +310,7 @@ class RevitApiHandler(object):
         if eid is None:
             return {"parameters": {}}
 
-        doc = HOST_APP.doc
+        doc = REVIT_CONTEXT.doc
         elem = doc.GetElement(DB.ElementId(int(eid)))  # type: DB.Element
         if elem is None:
             return {"parameters": {}}
@@ -324,7 +324,7 @@ class RevitApiHandler(object):
         if not raw:
             return None
 
-        doc = HOST_APP.doc
+        doc = REVIT_CONTEXT.doc
         id_list = List[DB.ElementId]()
         for eid in raw:
             eid_obj = DB.ElementId(int(eid))
@@ -334,7 +334,7 @@ class RevitApiHandler(object):
 
     def _active_view(self):
         # type: () -> DB.View
-        view = HOST_APP.uidoc.ActiveView  # type: DB.View
+        view = REVIT_CONTEXT.uidoc.ActiveView  # type: DB.View
         if view is None:
             raise ValueError("No active view")
         return view
@@ -345,7 +345,7 @@ class RevitApiHandler(object):
         override.SetSurfaceForegroundPatternColor(color)
         override.SetProjectionLineColor(color)
 
-        doc = HOST_APP.doc
+        doc = REVIT_CONTEXT.doc
         patterns = DB.FilteredElementCollector(doc).OfClass(DB.FillPatternElement)
         solid = next(
             (
