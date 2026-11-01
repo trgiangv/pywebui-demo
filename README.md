@@ -48,7 +48,7 @@ of many seconds. The launcher calls `pywebui.embed`, which loads pyRevit's pytho
 DLL and initializes the `CPY312` interpreter itself with `BeginAllowThreads`; the dashboard
 code then runs inside it and its threads keep running after the click.
 
-The transports come from the [pyWebUI](https://github.com/trgiangv/pyrevit-webview) lib (`pywebui.webview`, `pywebui.http`) and only move envelopes. Commands are registered on a `pywebui.Bridge`. `service.py` and everything below it never
+The transports come from the [pyWebUI](https://github.com/trgiangv/pywebui) lib (`pywebui.webview`, `pywebui.http`) and only move envelopes. Commands are registered on a `pywebui.Bridge`. `service.py` and everything below it never
 know which transport asked. `mock` is used when the page runs in a plain
 browser with no Revit.
 
@@ -159,7 +159,7 @@ pyrevit-webview-demo.extension/
 
 ## Setup (once)
 
-1. `pyrevit extend lib pyWebUI https://github.com/trgiangv/pyrevit-webview.git`
+1. `pyrevit extend lib pyWebUI https://github.com/trgiangv/pywebui.git`
 2. `pyrevit extensions paths add <repo root>`, then reload pyRevit.
 3. `cd pyrevit-webview-demo.extension/ui && vp install`
 4. For the editor: `pixi install`, then use `.pixi/envs/default/python.exe` as the interpreter.

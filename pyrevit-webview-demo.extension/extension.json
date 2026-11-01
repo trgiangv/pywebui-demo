@@ -7,7 +7,7 @@
     "description": "demo that use webview2 or browser as UI client for pyRevit extensions",
     "author": "trgiangv",
     "author_profile": "trgiangv",
-    "url": "https://github.com/trgiangv/pyrevit-webview-demo.git",
+    "url": "https://github.com/trgiangv/pywebui-demo.git",
     "website": "trgiangv.github.io/pyrevit-webview-demo",
     "image": "",
     "templates": {
