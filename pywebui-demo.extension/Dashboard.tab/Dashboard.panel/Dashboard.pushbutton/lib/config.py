@@ -9,7 +9,7 @@ from pywebui.runtime import find_python, packages_dir
 # Where the dashboard page comes from. Mode.DEV: Vite at DEV_SERVER_URL. Mode.LOCAL: ui/dist after `vp build`.
 # Mode.SERVER: the page deployed to PAGES_URL.
 MODE = Mode.SERVER
-PAGES_URL = "https://trgiangv.github.io/pyrevit-webview-demo/"
+PAGES_URL = "https://trgiangv.github.io/pywebui-demo/"
 DEV_SERVER_URL = "http://localhost:5173"
 DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "ui", "dist"))
 DEV_CDP_PORT = 9225

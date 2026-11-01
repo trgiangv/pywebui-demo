@@ -4,11 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - "pyrevit-webview-demo.extension/ui/**"
+      - "pywebui-demo.extension/ui/**"
       - ".github/workflows/pages.yml"
   pull_request:
     paths:
-      - "pyrevit-webview-demo.extension/ui/**"
+      - "pywebui-demo.extension/ui/**"
   workflow_dispatch:
 
 permissions:
@@ -20,7 +20,7 @@ concurrency:
 
 defaults:
   run:
-    working-directory: pyrevit-webview-demo.extension/ui
+    working-directory: pywebui-demo.extension/ui
 
 jobs:
   build:
@@ -36,7 +36,7 @@ jobs:
       - run: vp build
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: pyrevit-webview-demo.extension/ui/dist
+          path: pywebui-demo.extension/ui/dist
 
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'

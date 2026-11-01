@@ -1,4 +1,4 @@
-# pyrevit-webview-demo
+# pywebui-demo
 
 A BIM dashboard for Revit with one React UI and one set of Revit logic, hosted two ways:
 
@@ -137,7 +137,7 @@ sent as `snapshot-rows` events in chunks of 250.
 The repo root is the pyRevit search path.
 
 ```
-pyrevit-webview-demo.extension/
+pywebui-demo.extension/
     Dashboard.tab/Dashboard.panel/Dashboard.pushbutton/
         dashboard_script.py  IronPython launcher: TaskDialog, then pywebui.embed
         bundle.yaml
@@ -161,7 +161,7 @@ pyrevit-webview-demo.extension/
 
 1. `pyrevit extend lib pyWebUI https://github.com/trgiangv/pywebui.git`
 2. `pyrevit extensions paths add <repo root>`, then reload pyRevit.
-3. `cd pyrevit-webview-demo.extension/ui && vp install`
+3. `cd pywebui-demo.extension/ui && vp install`
 4. For the editor: `pixi install`, then use `.pixi/envs/default/python.exe` as the interpreter.
 
 Both choices run in the pyRevit `CPY312` engine. On pyRevit, `startup.py` (IronPython) checks it at load on a background thread. `pywebui.runtime.HTTP_REQUIREMENTS` (PEP 508 strings, the PEP 723 dependency form: `fastapi>=0.162.0`, `uvicorn>=0.54.0` and `packaging>=26.3`) must be installed, satisfy their specifiers and import. If any is missing, outside its specifier or broken, it installs them again with `pip install --target` into a staging folder and swaps it into `%LOCALAPPDATA%\pyWebUI\packages\pywebui\cp312` only after the check passes, so the engine's own `site-packages`, shared with other extensions, is never touched. The result is in the pyRevit log. `lib/config.py` (`embed_paths`) finds pyRevit's `pyRevitLabs.PythonNet.dll` (`netcore` on Revit 2025+, `netfx` before), the engine folder and `python312.dll`, and puts the button folder, `pyWebUI.lib` and that packages folder on the embedded interpreter's `sys.path`.

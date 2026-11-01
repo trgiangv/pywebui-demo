@@ -1,5 +1,5 @@
 [tool.pixi.workspace]
-name = "pyrevit-webview-demo"
+name = "pywebui-demo"
 channels = ["conda-forge"]
 platforms = ["win-64"]
 
