@@ -1,0 +1,44 @@
+[tool.pixi.workspace]
+name = "pyrevit-webview-demo"
+channels = ["conda-forge"]
+platforms = ["win-64"]
+
+[tool.pixi.dependencies]
+python = "3.14.*"
+
+[tool.pixi.pypi-dependencies]
+fastapi = "*"
+starlette = ">=0.51"
+uvicorn = "*"
+pydantic = ">=2.9"
+
+
+[tool.ruff]
+line-length = 100
+src = ["."]
+# Pyupgrade is ignored below; otherwise the editor rewrites "{0}".format calls.
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9"]
+# UP is the whole pyupgrade set. The editor rule on "{0}".format is UP030.
+# UP032 would replace those calls with f-strings, which IronPython 2.7 cannot parse.
+# Also kept: coding cookie (UP009), __future__ (UP010), class(object) (UP004).
+# F401: names that exist only for `# type:` comments look unused.
+# F821: __revit__ is injected by the host.
+ignore = [
+    "UP",
+    "UP004",
+    "UP009",
+    "UP010",
+    "UP030",
+    "UP032",
+    "F401",
+    "F821",
+]
+
+[tool.ruff.lint.isort]
+required-imports = ["from __future__ import division, print_function"]
+
+[tool.ruff.format]
+quote-style = "double"

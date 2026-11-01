@@ -1,14 +1,13 @@
-{
-  "[python]": {
-    "editor.defaultFormatter": "charliermarsh.ruff",
-    "editor.formatOnSave": true
-  },
-  "basedpyright.analysis.typeCheckingMode": "standard",
-  "basedpyright.analysis.extraPaths": [
-    "~/AppData/Roaming/pyRevit-Master/pyrevitlib",
-    "~/AppData/Roaming/pyRevit-Master/site-packages",
-    "~/AppData/Roaming/RevitDevTool/2025/Stubs",
-    "~/AppData/Roaming/pyRevit/Extensions/pyrevit_webview.lib",
-    "${workspaceFolder}/pyrevit-webview-demo.extension/lib"
-  ]
-}
+// {
+//   "[python]": {
+//     "editor.defaultFormatter": "charliermarsh.ruff",
+//     "editor.formatOnSave": true
+//   },
+//   "basedpyright.analysis.typeCheckingMode": "standard",
+//   "basedpyright.analysis.extraPaths": [
+//     "~/AppData/Roaming/pyRevit-Master/pyrevitlib",
+//     "~/AppData/Roaming/pyRevit-Master/site-packages",
+//     "~/AppData/Roaming/RevitDevTool/2025/Stubs",
+//     "~/AppData/Roaming/pyRevit/Extensions/pyWebUI.lib",
+//   ]
+// }
