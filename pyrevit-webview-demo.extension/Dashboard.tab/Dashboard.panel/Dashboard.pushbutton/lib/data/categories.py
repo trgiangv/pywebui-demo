@@ -1,20 +1,12 @@
 # -*- coding: utf-8 -*-
-"""BuiltInCategory registry.
-
-Groups are plain string keys. Callers can pass a subset
-(for example STRUCTURAL and MEP) to ``get_model_categories``.
-"""
-
 from __future__ import division, print_function
 
 from collections import OrderedDict
 
-from pyrevit import DB
+from Autodesk.Revit import DB
 
 
 class CategoryGroup(object):
-    """Logical discipline grouping keys."""
-
     STRUCTURAL = "STRUCTURAL"
     ARCHITECTURAL = "ARCHITECTURAL"
     MEP_MECHANICAL = "MEP_MECHANICAL"
@@ -26,7 +18,6 @@ class CategoryGroup(object):
     GENERIC = "GENERIC"
 
 
-# Insertion order is the collection order when no groups are requested.
 CATEGORY_REGISTRY = OrderedDict((  # type: OrderedDict[str, list[DB.BuiltInCategory]]
     (CategoryGroup.STRUCTURAL, [
         DB.BuiltInCategory.OST_StructuralColumns,
@@ -113,10 +104,6 @@ CATEGORY_REGISTRY = OrderedDict((  # type: OrderedDict[str, list[DB.BuiltInCateg
 
 def get_model_categories(groups=None):
     # type: (list[str] | None) -> list[DB.BuiltInCategory]
-    """Return a flat list of ``BuiltInCategory`` for the requested groups.
-
-    ``None`` or an empty list includes every registered group.
-    """
     targets = groups or list(CATEGORY_REGISTRY.keys())
     result = []  # type: list[DB.BuiltInCategory]
     for group in targets:
@@ -126,5 +113,4 @@ def get_model_categories(groups=None):
 
 def get_group_names():
     # type: () -> list[str]
-    """Return all available group names."""
     return list(CATEGORY_REGISTRY.keys())

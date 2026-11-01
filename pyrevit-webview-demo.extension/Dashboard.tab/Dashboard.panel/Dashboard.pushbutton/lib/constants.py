@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Sentinels and column names for collected element rows."""
-
 from __future__ import division, print_function
 
 
 class Sentinel(object):
-    """Missing-value placeholder for a data column."""
-
     def __init__(self, label, column):
         # type: (str, str) -> None
         self.label = label  # type: str
@@ -36,7 +32,6 @@ for _sentinel in ALL_SENTINELS:
 
 def sentinel_for(column):
     # type: (str) -> Sentinel
-    """Return the sentinel for *column*, or raise ``KeyError``."""
     return _SENTINEL_MAP[column]
 
 
@@ -65,7 +60,6 @@ FILTERABLE_COLUMNS = (
     "workset",
 )
 
-# Extra Revit parameter names collected onto each row. Empty means none.
 EXTRA_PARAMETERS = []
 
 SCHEMA_VERSION = "2.0.0"

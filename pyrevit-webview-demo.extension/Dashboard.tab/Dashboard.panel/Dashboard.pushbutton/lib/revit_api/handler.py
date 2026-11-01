@@ -1,37 +1,33 @@
 # -*- coding: utf-8 -*-
-"""Revit API command bodies for the dashboard.
-
-Do not use a cached document. Read ``REVIT_CONTEXT.doc`` at call time.
-``with Transaction`` is the form this package already runs under pythonnet.
-Temporary view modes still need a transaction.
-"""
-
 from __future__ import division, print_function
 
-from pyrevit import DB
-from pyrevit_webview.adapter.revit import REVIT_CONTEXT
-from pyrevit_webview.compat import Callable
-from pyrevit_webview.serialize import JsonValue
+from Autodesk.Revit import DB
+from pywebui import Bridge
+from pywebui.adapter.revit import REVIT_CONTEXT
+from pywebui.compat import Callable
+from pywebui.serialize import JsonValue
 from System.Collections.Generic import List
 
-from revit_dashboard.log import get_logger
+from lib.log import get_logger
 
-from revit_dashboard.data.collector import collect_model_elements, collect_model_info
-from revit_dashboard.data.warnings import collect_warnings
+from lib.data.collector import collect_model_elements, collect_model_info
+from lib.data.warnings import collect_warnings
 
 log = get_logger()
 
 def _run_transaction(doc, name, action):
     # type: (DB.Document, str, Callable[[], None]) -> None
-    """Run ``action`` inside a transaction. Failures roll back and are logged."""
-    with DB.Transaction(doc, name) as transaction:
-        transaction.Start()
-        try:
-            action()
-            transaction.Commit()
-        except Exception as exc:
-            log.error("transaction '{}' rolled back: {}".format(name, exc))
-            transaction.RollBack()
+    """Run ``action`` inside a transaction. A failure rolls back and is raised."""
+    transaction = DB.Transaction(doc, name)
+    transaction.Start()
+    try:
+        action()
+        transaction.Commit()
+    except Exception:
+        transaction.RollBack()
+        raise
+    finally:
+        transaction.Dispose()
 
 
 def _element_level_name(doc, element_id):
@@ -95,35 +91,20 @@ def _isolate_id_list(doc, view, id_list, level_name, category_name):
 
 
 class RevitApiHandler(object):
-    """Command bodies addressed by the bridge command name."""
-
-    def __init__(self):
-        # type: () -> None
-        self._commands = {  # type: dict[str, Callable[[dict[str, JsonValue]], dict[str, JsonValue] | None]]
-            "GetSnapshot": self._cmd_get_snapshot,
-            "Select": self._cmd_select,
-            "Zoom": self._cmd_zoom,
-            "Isolate": self._cmd_isolate,
-            "ResetIsolation": self._cmd_reset_isolation,
-            "ColorOverride": self._cmd_color_override,
-            "ClearOverrides": self._cmd_clear_overrides,
-            "IsolateByLevelCategory": self._cmd_isolate_by_level_category,
-            "CreateWarningView": self._cmd_create_warning_view,
-            "ApplyGroupOverrides": self._cmd_apply_group_overrides,
-            "ResetScheduleMode": self._cmd_reset_schedule_mode,
-            "GetElementParameters": self._cmd_get_element_parameters,
-        }
-
-    def knows(self, command):
-        # type: (str) -> bool
-        return command in self._commands
-
-    def run(self, command, payload):
-        # type: (str, dict[str, JsonValue]) -> dict[str, JsonValue] | None
-        """Run a known command. ``payload`` is the request object."""
-        if payload is None:
-            payload = {}
-        return self._commands[command](payload)
+    def __init__(self, bridge):
+        # type: (Bridge) -> None
+        bridge.add("GetSnapshot", self._cmd_get_snapshot)
+        bridge.add("Select", self._cmd_select)
+        bridge.add("Zoom", self._cmd_zoom)
+        bridge.add("Isolate", self._cmd_isolate)
+        bridge.add("ResetIsolation", self._cmd_reset_isolation)
+        bridge.add("ColorOverride", self._cmd_color_override)
+        bridge.add("ClearOverrides", self._cmd_clear_overrides)
+        bridge.add("IsolateByLevelCategory", self._cmd_isolate_by_level_category)
+        bridge.add("CreateWarningView", self._cmd_create_warning_view)
+        bridge.add("ApplyGroupOverrides", self._cmd_apply_group_overrides)
+        bridge.add("ResetScheduleMode", self._cmd_reset_schedule_mode)
+        bridge.add("GetElementParameters", self._cmd_get_element_parameters)
 
     def _cmd_get_snapshot(self, _params):
         # type: (dict[str, JsonValue]) -> dict[str, JsonValue]
@@ -213,7 +194,6 @@ class RevitApiHandler(object):
 
     def _cmd_isolate_by_level_category(self, params):
         # type: (dict[str, JsonValue]) -> None
-        """Isolate elements matching a level name and category name."""
         level_name = params.get("level", "")
         category_name = params.get("category", "")
         doc = REVIT_CONTEXT.doc
@@ -229,7 +209,6 @@ class RevitApiHandler(object):
 
     def _cmd_create_warning_view(self, params):
         # type: (dict[str, JsonValue]) -> None
-        """Temporarily isolate the warning elements in the active view."""
         ids = self._resolve_ids(params)
         if not ids:
             log.warning("no valid warning element ids")
@@ -248,11 +227,6 @@ class RevitApiHandler(object):
 
     def _cmd_apply_group_overrides(self, params):
         # type: (dict[str, JsonValue]) -> None
-        """Clear overrides, paint group colors, and optionally isolate.
-
-        ``groups`` is a list of ``{element_ids, color}``.
-        ``isolate_ids`` isolates those ids when it is a non-empty list.
-        """
         doc = REVIT_CONTEXT.doc
         view = self._active_view()
         groups = params.get("groups", [])
@@ -289,7 +263,6 @@ class RevitApiHandler(object):
 
     def _cmd_reset_schedule_mode(self, _params):
         # type: (dict[str, JsonValue]) -> None
-        """Clear temporary isolation and graphic overrides."""
         view = self._active_view()
         doc = REVIT_CONTEXT.doc
 
@@ -305,7 +278,6 @@ class RevitApiHandler(object):
 
     def _cmd_get_element_parameters(self, params):
         # type: (dict[str, JsonValue]) -> dict[str, JsonValue]
-        """Return all parameters for one element, grouped by parameter group."""
         eid = params.get("element_id")
         if eid is None:
             return {"parameters": {}}
@@ -319,7 +291,6 @@ class RevitApiHandler(object):
 
     def _resolve_ids(self, params):
         # type: (dict[str, JsonValue]) -> List[DB.ElementId] | None
-        """Return a .NET ``List[DB.ElementId]`` of ids that still exist."""
         raw = params.get("element_ids", [])
         if not raw:
             return None
@@ -363,7 +334,6 @@ class RevitApiHandler(object):
 
 def _clean_group_name(raw):
     # type: (str) -> str
-    """Turn a ParameterGroup enum name into a readable label."""
     if not raw or raw == "INVALID":
         return "Other"
     name = raw.replace("PG_", "").replace("_", " ").title()
@@ -404,7 +374,6 @@ def _get_group_label(definition):
 
 def _group_parameters(element):
     # type: (DB.Element) -> dict[str, list[dict[str, str | bool]]]
-    """Group ``element.Parameters`` for the properties pane."""
     groups = {}  # type: dict[str, list[dict[str, str | bool]]]
     for param in element.Parameters:
         parameter = param  # type: DB.Parameter

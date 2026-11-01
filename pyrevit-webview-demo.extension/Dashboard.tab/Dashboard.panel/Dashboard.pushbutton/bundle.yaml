@@ -1,0 +1,5 @@
+title: Dashboard
+tooltip: Open the BIM dashboard in a WebView2 window or in your browser
+
+engine:
+  clean: true

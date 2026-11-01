@@ -1,26 +1,16 @@
 # -*- coding: utf-8 -*-
-"""Collect Revit document warnings.
-
-Severity is the ``FailureSeverity`` name from ``ToString``.
-The page classifies the description text.
-"""
-
 from __future__ import division, print_function
 
-from pyrevit import DB
+from Autodesk.Revit import DB
 from System.Collections.Generic import ICollection, IList
 
-from revit_dashboard.log import get_logger
+from lib.log import get_logger
 
 log = get_logger()
 
 
 def collect_warnings(doc):
     # type: (DB.Document) -> list[dict[str, str | int | list[str]]]
-    """Collect warnings from the Revit document.
-
-    Each item is ``id``, ``description``, ``severity``, ``element_ids``.
-    """
     failure_messages = _failure_messages(doc)
     if failure_messages is None:
         return []

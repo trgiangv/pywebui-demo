@@ -1,5 +1,0 @@
-title: WebView2
-tooltip: Dashboard hosted in an embedded WebView2 window (postMessage bridge)
-
-engine:
-  clean: true

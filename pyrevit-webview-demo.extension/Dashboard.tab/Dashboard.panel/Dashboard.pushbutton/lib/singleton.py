@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""State that survives a clean engine.
+"""The open window of each transport, kept in the AppDomain.
 
-A clean engine reloads every module on each button click, so module globals
-reset. The open window is kept in the AppDomain instead.
+The embedded interpreter outlives a button click and caches ``lib.*``, so a
+module global would work too. The AppDomain keeps the window reachable if the
+modules are ever reloaded.
 """
 
 from __future__ import division, print_function

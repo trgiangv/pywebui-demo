@@ -1,35 +1,27 @@
 # -*- coding: utf-8 -*-
-"""Transport 1: dashboard inside a WPF window hosting WebView2.
-
-The window navigates to the hosted page (GitHub Pages, or the Vite server in dev).
-
-Requests arrive through ``chrome.webview.postMessage``. Replies and events go
-back as a ``bim-bridge`` CustomEvent dispatched with ``ExecuteScriptAsync``.
-"""
-
 from __future__ import division, print_function
 
 import os
 import traceback
 
-from pyrevit import forms
-from revit_dashboard.log import get_logger
-from pyrevit_webview import EnvelopeField, event_message, parse_request
-from pyrevit_webview.adapter.revit import REVIT_CONTEXT
-from pyrevit_webview.host import (
-    RemoteContent,
+from Autodesk.Revit import UI
+from Microsoft.Win32 import SaveFileDialog
+from lib.log import get_logger
+from pywebui import Bridge, EnvelopeField, EnvelopeSink, event_message, parse_request
+from pywebui.adapter.revit import REVIT_CONTEXT
+from pywebui.webview import (
     WebViewControl,
     WebViewSession,
     WebViewSettings,
 )
-from pyrevit_webview.host.wpf import WebView2, WpfUi
-from pyrevit_webview.serialize import serialize
+from pywebui.webview.wpf import WebView2, WpfUi
+from pywebui.serialize import serialize
 from System import Convert
 from System.IO import File
 
-from revit_dashboard import config, singleton
-from revit_dashboard.service import DashboardService, EnvelopeSink
-from revit_dashboard.windows import create_window
+from lib import config, singleton
+from lib.service import DashboardService
+from lib.windows import create_window
 
 _ROW_CHUNK = 250
 
@@ -37,8 +29,6 @@ log = get_logger()
 
 
 class WebViewSink(EnvelopeSink):
-    """Delivers envelopes to the page. Large ``rows`` go out in chunks."""
-
     def __init__(self):
         self.control = None  # type: WebViewControl | None
 
@@ -82,25 +72,20 @@ class WebViewSink(EnvelopeSink):
 
 
 def show_dashboard(uiapp):
-    # type: (UIApplication) -> None
-    """Open one modeless dashboard window, or activate the existing one."""
+    # type: (UI.UIApplication) -> None
     active = singleton.get("webview_window")
     if active is not None:
-        try:
-            active.Activate()
-            return
-        except Exception:
-            singleton.put("webview_window", None)
+        active.Activate()
+        return
 
     REVIT_CONTEXT.initialize(uiapp)
 
     try:
         sink = WebViewSink()
         window = create_window("BIM Dashboard (WebView2)", 1600, 900)
-        service = DashboardService(
-            sink,
-            extra_commands={"SaveWorkbook": _write_workbook},
-        )
+        bridge = Bridge()
+        bridge.add("SaveWorkbook", _write_workbook)
+        service = DashboardService(sink, bridge)
         webview = WebView2() # type: WebView2
         window.Content = webview
 
@@ -129,11 +114,10 @@ def show_dashboard(uiapp):
         singleton.put("webview_window", window)
     except Exception as ex:
         log.exception("showing WebView failed")
-        forms.alert("Error showing WebView: {}\n\n{}".format(ex, traceback.format_exc()), title="Error")
+        UI.TaskDialog.Show("BIM Dashboard", "Error showing WebView: {}\n\n{}".format(ex, traceback.format_exc()))
 
 
 def _write_workbook(payload):
-    """Show the Save dialog and write the workbook bytes."""
     if not isinstance(payload, dict):
         raise TypeError("workbook payload is missing")
     content = payload.get("content_base64")
@@ -141,20 +125,23 @@ def _write_workbook(payload):
         raise ValueError("workbook is empty")
 
     filename = os.path.basename(str(payload.get("filename") or "bim_dashboard_export.xlsx"))
-    path = forms.save_file(file_ext="xlsx", default_name=filename, title="Export Dashboard")
-    if not path:
+    dialog = SaveFileDialog()
+    dialog.Title = "Export Dashboard"
+    dialog.Filter = "Excel workbook (*.xlsx)|*.xlsx"
+    dialog.FileName = filename
+    if not dialog.ShowDialog():
         return {"cancelled": True}
 
-    File.WriteAllBytes(path, Convert.FromBase64String(content))
-    return {"cancelled": False, "path": path}
+    File.WriteAllBytes(dialog.FileName, Convert.FromBase64String(content))
+    return {"cancelled": False, "path": dialog.FileName}
 
 
 def _session():
     # type: () -> WebViewSession
-    dev = config.dev_mode()
+    site = config.site()
     return WebViewSession(
-        RemoteContent(config.page_url()),
+        site.webview_content(),
         app_name="RevitDashboard",
-        debug_cdp_port=config.DEV_CDP_PORT if dev else None,
-        settings=WebViewSettings(dev_tools_enabled=dev),
+        debug_cdp_port=config.DEV_CDP_PORT if site.dev else None,
+        settings=WebViewSettings(dev_tools_enabled=site.dev),
     )

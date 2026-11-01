@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Revit model element collection with category filtering."""
-
 from __future__ import division, print_function
 
 import traceback
 
-from pyrevit import DB
-from pyrevit_webview.adapter.revit import REVIT_CONTEXT
+from Autodesk.Revit import DB
+from pywebui.adapter.revit import REVIT_CONTEXT
 
-from revit_dashboard.constants import (
+from lib.constants import (
     EXTRA_PARAMETERS,
     MISSING_CATEGORY,
     MISSING_FAMILY,
@@ -17,16 +15,14 @@ from revit_dashboard.constants import (
     MISSING_TYPE,
     MISSING_WORKSET,
 )
-from revit_dashboard.data.categories import get_model_categories
-from revit_dashboard.log import get_logger
+from lib.data.categories import get_model_categories
+from lib.log import get_logger
 
 log = get_logger()
 
 
 def collect_model_info(doc):
     # type: (DB.Document) -> dict[str, str | int]
-    """Collect filename, path, active view, and view/sheet counts."""
-    
     file_name = doc.Title or "Untitled"
     file_path = doc.PathName or ""
 
@@ -60,12 +56,6 @@ def collect_model_info(doc):
 
 def collect_model_elements(doc, categories=None, extra_parameters=None):
     # type: (DB.Document, list[DB.BuiltInCategory] | None, list[str] | None) -> list[dict[str, str | bool]]
-    """Collect instances for each registered ``BuiltInCategory``.
-
-    ``OfCategory`` is one category per pass. A category Revit rejects is
-    skipped, and the other categories still return. ``categories`` overrides
-    the registry. ``extra_parameters`` adds named Revit parameters onto each row.
-    """
     if categories is None:
         categories = get_model_categories()
 
@@ -130,7 +120,6 @@ def _collect_category(doc, category, levels, phases, extra_parameters, types):
 
 def _collect_levels(doc):
     # type: (DB.Document) -> dict[str, str]
-    """Pre-cache level id to name."""
     result = {}
     for level in (
         DB.FilteredElementCollector(doc)
@@ -144,7 +133,6 @@ def _collect_levels(doc):
 
 def _collect_phases(doc):
     # type: (DB.Document) -> dict[str, str]
-    """Pre-cache phase id to name."""
     result = {}
     for phase in doc.Phases:
         phase_element = phase  # type: DB.Phase
@@ -211,7 +199,6 @@ def _revit_name(element):
 
 def _cached_type(doc, element, types):
     # type: (DB.Document, DB.Element, dict[str, DB.ElementType | None]) -> DB.ElementType | None
-    """Resolve ``GetTypeId`` once per id for this snapshot."""
     type_id = element.GetTypeId()
     if type_id.Equals(DB.ElementId.InvalidElementId):
         return None
@@ -286,7 +273,6 @@ def _param_value_as_string(param):
 
 def _collect_extra_params(element, param_names):
     # type: (DB.Element, list[str]) -> dict[str, str]
-    """Collect named parameters via ``LookupParameter``."""
     result = {}
     for name in param_names:
         param = element.LookupParameter(name)  # type: DB.Parameter
@@ -299,7 +285,6 @@ def _collect_extra_params(element, param_names):
 
 def collect_all_parameters(element):
     # type: (DB.Element) -> dict[str, str]
-    """Collect every parameter on ``element.Parameters`` as name to text."""
     result = {}
     for param in element.Parameters:
         parameter = param  # type: DB.Parameter
