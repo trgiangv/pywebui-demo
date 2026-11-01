@@ -1,6 +1,6 @@
 # BIM Dashboard UI
 
-React page for the open Revit document. Revit hosts it in WebView2. A browser session uses mock data.
+React page for the open Revit document. Revit hosts it in WebView2 or the default browser. Opened on its own, it uses mock data.
 
 ## Run
 
@@ -19,8 +19,7 @@ The page picks its data source on load:
 | URL has `?port=<n>#token=<t>` (opened by the Browser button) | HTTP + SSE to `http://127.0.0.1:<n>` |
 | Anywhere else                                                | mock data                            |
 
-The released page is hosted on GitHub Pages. In Revit, set `REVIT_DASHBOARD_DEV=1`
-to make both buttons open this dev server instead.
+The released page is hosted on GitHub Pages. In Revit, `MODE` in `lib/config.py` picks the source for both hosts: `Mode.SERVER` (Pages, default), `Mode.DEV` (this dev server) or `Mode.LOCAL` (`dist` after `vp build`).
 
 ## Check
 
