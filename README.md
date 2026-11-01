@@ -164,7 +164,7 @@ pyrevit-webview-demo.extension/
 3. `cd pyrevit-webview-demo.extension/ui && vp install`
 4. For the editor: `pixi install`, then use `.pixi/envs/default/python.exe` as the interpreter.
 
-Both choices run in the pyRevit `CPY312` engine. On pyRevit, `startup.py` (IronPython) checks it at load on a background thread. `pywebui.runtime.HTTP_REQUIREMENTS` (`fastapi`, `starlette>=0.51`, `uvicorn`, `pydantic>=2.9`) must be installed, at those versions, and import. If any is missing, too old or broken, it deletes `%LOCALAPPDATA%\pyWebUI\packages\cp312` and installs them again with `pip install --target`, so the engine's own `site-packages`, shared with other extensions, is never touched. The result is in the pyRevit log. `lib/config.py` (`embed_paths`) finds pyRevit's `pyRevitLabs.PythonNet.dll` (`netcore` on Revit 2025+, `netfx` before), the engine folder and `python312.dll`, and puts the button folder, `pyWebUI.lib` and that packages folder on the embedded interpreter's `sys.path`.
+Both choices run in the pyRevit `CPY312` engine. On pyRevit, `startup.py` (IronPython) checks it at load on a background thread. `pywebui.runtime.HTTP_REQUIREMENTS` (PEP 508 strings, the PEP 723 dependency form: `fastapi>=0.162.0`, `uvicorn>=0.54.0` and `packaging>=26.3`) must be installed, satisfy their specifiers and import. If any is missing, outside its specifier or broken, it installs them again with `pip install --target` into a staging folder and swaps it into `%LOCALAPPDATA%\pyWebUI\packages\pywebui\cp312` only after the check passes, so the engine's own `site-packages`, shared with other extensions, is never touched. The result is in the pyRevit log. `lib/config.py` (`embed_paths`) finds pyRevit's `pyRevitLabs.PythonNet.dll` (`netcore` on Revit 2025+, `netfx` before), the engine folder and `python312.dll`, and puts the button folder, `pyWebUI.lib` and that packages folder on the embedded interpreter's `sys.path`.
 
 `pyproject.toml` sets up the same Python and packages with pixi for the editor.
 
@@ -208,3 +208,7 @@ Pages to **GitHub Actions** in the repository settings.
 - The UI toolchain is Vite+ (`vp install | dev | build | check | test`), with
   versions pinned in `ui/pnpm-workspace.yaml`.
 - The embed path is not yet tested in Revit.
+
+## Decisions
+
+- [ADR-0001: browser to Revit architecture (Vietnamese)](docs/adr/0001-browser-revit-architecture.md): runtime, transport, security, AI direction, backlog and pitfalls.

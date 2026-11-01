@@ -7,10 +7,9 @@ platforms = ["win-64"]
 python = "3.14.*"
 
 [tool.pixi.pypi-dependencies]
-fastapi = "*"
-starlette = ">=0.51"
-uvicorn = "*"
-pydantic = ">=2.9"
+fastapi = ">=0.162.0"
+uvicorn = ">=0.54.0"
+packaging = ">=26.3"
 
 
 [tool.ruff]
