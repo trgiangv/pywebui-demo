@@ -1,8 +1,3 @@
-/**
- * Schedule columns. Width, filter field, and group-by live on the column,
- * so callers do not special-case key strings.
- */
-
 import type { DashboardFilterState } from "@/types"
 
 export type ScheduleFilterField = keyof Pick<
@@ -34,7 +29,6 @@ export const GROUP_COLUMNS = SCHEDULE_COLUMNS.filter((column) => column.group).m
   (column) => column.key,
 )
 
-/** Filter field for a column that appears in the schedule catalog. */
 export function getFilterKey(col: string): ScheduleFilterField | undefined {
   return COLUMN_BY_KEY.get(col)?.filter
 }

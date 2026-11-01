@@ -47,19 +47,16 @@ export function ThemeProvider({
     else document.body.removeAttribute("theme-mode")
   }
 
-  // Sync both Tailwind dark class AND Semi Design theme-mode attribute
   useEffect(() => {
     const root = document.documentElement
     const body = document.body
 
-    // Tailwind dark class on <html>
     root.classList.remove("light", "dark")
     root.classList.add(resolvedTheme)
 
     // Semi scrollbar tokens. The class styles this node and every scrolling descendant.
     body.classList.add("semi-light-scrollbar")
 
-    // Semi Design dark mode on <body>
     if (resolvedTheme === "dark") {
       body.setAttribute("theme-mode", "dark")
     } else {
@@ -67,7 +64,6 @@ export function ThemeProvider({
     }
   }, [resolvedTheme])
 
-  // Listen for system theme changes
   useEffect(() => {
     if (theme !== "system") return
 

@@ -1,7 +1,3 @@
-/**
- * Settings page — placeholder for dashboard configuration.
- */
-
 import { Empty } from "@douyinfe/semi-ui"
 import { Settings } from "lucide-react"
 

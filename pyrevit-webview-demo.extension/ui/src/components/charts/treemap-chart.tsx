@@ -1,8 +1,3 @@
-/**
- * Level / category treemap. ECharts lays out the rectangles.
- * A leaf click isolates that level and category in Revit.
- */
-
 import { useMemo } from "react"
 import type { EChartsCoreOption } from "echarts/core"
 import { Card, Typography } from "@douyinfe/semi-ui"

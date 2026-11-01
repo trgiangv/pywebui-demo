@@ -1,4 +1,4 @@
-/** Wire names from `pyrevit_webview.bridge.contract`. Values are the JSON text. */
+/** Wire names from `pywebui.bridge.contract`. Values are the JSON text. */
 
 export const EnvelopeKind = {
   REQUEST: "request",

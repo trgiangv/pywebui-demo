@@ -1,10 +1,3 @@
-/**
- * Client-side dashboard analytics.
- *
- * The host snapshot is only model info, element rows, and raw Revit warnings.
- * This module classifies warnings and builds the DashboardPayload the pages read.
- */
-
 import { displayText } from "@/lib/text"
 import type {
   ChartConfig,
@@ -102,7 +95,6 @@ export function buildDashboard(
   }
 }
 
-/** Accept a host snapshot, or a payload that already has the snapshot fields. */
 export function toDashboardPayload(data: unknown): DashboardPayload | null {
   if (!data || typeof data !== "object") return null
   const record = data as Partial<HostSnapshot>

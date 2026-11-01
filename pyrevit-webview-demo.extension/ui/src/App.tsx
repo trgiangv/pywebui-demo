@@ -1,17 +1,3 @@
-/**
- * Main Dashboard Application — orchestrates layout, navigation, and pages.
- *
- * Layout:
- * ┌──────────────────────────────────────────────────┐
- * │ Sidebar │  Top Bar (Breadcrumb + Actions)        │
- * │  (Nav)  │────────────────────────────────────────│
- * │         │  Main Content (Active Page)             │
- * │         │                          ┌─────────────│
- * │         │                          │ Properties  │
- * │         │                          │ Panel       │
- * └──────────────────────────────────────────────────┘
- */
-
 import { useEffect, useState, useCallback } from "react"
 import { toast } from "@/lib/toast"
 import { Banner, Layout, Spin } from "@douyinfe/semi-ui"
@@ -45,7 +31,6 @@ function DashboardContent() {
   const [activePage, setActivePage] = useState<PageId>("home")
   const [propertiesVisible, setPropertiesVisible] = useState(false)
 
-  // Open properties panel when element is selected (Ghost Mode)
   useEffect(() => {
     if (propertiesElement) {
       setPropertiesVisible(true)

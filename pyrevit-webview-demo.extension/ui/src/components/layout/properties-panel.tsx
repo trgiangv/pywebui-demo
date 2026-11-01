@@ -1,9 +1,3 @@
-/**
- * Properties Panel — Revit-style Properties Pane.
- * Shows grouped, collapsible parameter sections fetched via getElementParameters.
- * Features: read-only indicator, copy button, status tags, search.
- */
-
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   Button,
@@ -26,7 +20,6 @@ import type { ElementRow } from "@/types"
 
 const { Text } = Typography
 
-/** Shape of a single parameter returned by the bridge */
 interface ParameterInfo {
   name: string
   value: string
@@ -42,7 +35,6 @@ interface PropertiesPanelProps {
   onClose: () => void
 }
 
-/** Preferred group ordering (Revit-like) */
 const GROUP_ORDER = [
   "Identity Data",
   "Constraints",
@@ -169,7 +161,6 @@ export function PropertiesPanel({ element, visible, onClose }: Readonly<Properti
   const [nameWidth, setNameWidth] = useState("46%")
   const loadingRef = useRef(false)
 
-  // Fetch parameters when element changes
   useEffect(() => {
     if (!element || !visible) {
       return
@@ -190,7 +181,6 @@ export function PropertiesPanel({ element, visible, onClose }: Readonly<Properti
       .then((result) => {
         if (!cancelled) {
           setParams(result.parameters)
-          // Auto-expand all groups
           setExpandedKeys(Object.keys(result.parameters))
         }
       })
@@ -210,7 +200,6 @@ export function PropertiesPanel({ element, visible, onClose }: Readonly<Properti
     }
   }, [element, visible, bridge])
 
-  // Copy value to clipboard
   const handleCopy = useCallback((value: string) => {
     navigator.clipboard.writeText(value).then(
       () => toast.success("Copied to clipboard"),
@@ -218,13 +207,11 @@ export function PropertiesPanel({ element, visible, onClose }: Readonly<Properti
     )
   }, [])
 
-  // Sorted group names
   const sortedGroups = useMemo(() => {
     if (!params) return []
     return Object.keys(params).sort((a, b) => groupSortKey(a) - groupSortKey(b))
   }, [params])
 
-  // Filtered groups based on search
   const filteredGroups = useMemo(() => {
     if (!params) return []
     if (!search.trim()) return sortedGroups

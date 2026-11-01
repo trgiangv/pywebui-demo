@@ -1,7 +1,3 @@
-/**
- * Vertical navigation. Collapse and the selected item are Semi Nav.
- */
-
 import { Nav } from "@douyinfe/semi-ui"
 import { Boxes, Gauge, HeartPulse, Settings, Table2 } from "lucide-react"
 

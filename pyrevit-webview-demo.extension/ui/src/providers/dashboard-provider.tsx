@@ -1,13 +1,3 @@
-/**
- * Central dashboard state: payload, filters, selection, chart interaction, ghost mode.
- *
- * Supports both:
- * - Browser mode: Uses mock data
- * - Revit mode: Uses real data from WebView2 bridge
- *
- * Host mode loads a GetSnapshot envelope and builds the payload in the page.
- */
-
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import type { DashboardFilterState, DashboardPayload, ElementRow } from "@/types"
 import { useBridge } from "./bridge-provider"
@@ -24,23 +14,17 @@ interface DashboardState {
   payload: DashboardPayload | null
   loadError: string | null
   isRefreshing: boolean
-  // filters
   filters: DashboardFilterState
   setFilters: React.Dispatch<React.SetStateAction<DashboardFilterState>>
   resetFilters: () => void
-  // selection
   selectedIds: Set<string>
   setSelectedIds: React.Dispatch<React.SetStateAction<Set<string>>>
-  // chart interaction
   chartFilter: ChartFilter | null
   setChartFilter: React.Dispatch<React.SetStateAction<ChartFilter | null>>
-  // ghost mode — element selected from Revit or table click
   propertiesElement: ElementRow | null
   setPropertiesElement: React.Dispatch<React.SetStateAction<ElementRow | null>>
-  // derived
   allRows: ElementRow[]
   filteredRows: ElementRow[]
-  // actions
   refreshData: () => Promise<void>
 }
 
@@ -83,7 +67,6 @@ export function DashboardProvider({ children }: Readonly<{ children: React.React
     }
   }, [bridge])
 
-  // Save session snapshot when payload changes
   useEffect(() => {
     if (payload?.kpis) {
       pushSessionSnapshot(payload.kpis)

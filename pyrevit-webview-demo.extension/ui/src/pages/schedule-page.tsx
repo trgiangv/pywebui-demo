@@ -1,8 +1,3 @@
-/**
- * Smart Schedule — Interactive Data Grid with grouping + Parameter Auditor.
- * Enhanced Revit Schedule with Excel-like filter, context menu, and color picker.
- */
-
 import { useEffect, useMemo, useState, useCallback, useRef } from "react"
 import {
   Banner,
@@ -40,18 +35,12 @@ import { displayText } from "@/lib/text"
 
 const { Text } = Typography
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Check if a cell value is empty/null/undefined */
 function isEmptyValue(value: unknown): boolean {
   if (value === null || value === undefined) return true
   if (typeof value === "string" && value.trim() === "") return true
   return false
 }
 
-/** Build a composite group key from multiple columns */
 function buildGroupKey(row: Record<string, unknown>, columns: string[]): string {
   return columns.map((col) => displayText(row[col], "Unknown")).join(" / ")
 }
@@ -108,10 +97,6 @@ function useFillSize() {
   return { ref, width: size.width, height: size.height }
 }
 
-// ---------------------------------------------------------------------------
-// ColumnFilterDropdown — Excel-like filter for each column
-// ---------------------------------------------------------------------------
-
 function ColumnFilterDropdown({
   col,
   filterKey,
@@ -131,7 +116,6 @@ function ColumnFilterDropdown({
 
   const selected = [...(filters[filterKey] ?? [])]
 
-  // Get unique values for this column
   const uniqueValues = useMemo(() => {
     const values = new Set<string>()
     for (const row of allRows) {
@@ -167,7 +151,6 @@ function ColumnFilterDropdown({
     return () => document.removeEventListener("mousedown", handler)
   }, [open])
 
-  // Helper function to handle option toggle (shared logic)
   const handleOptionToggle = useCallback(
     (opt: string, checked: boolean) => {
       const next = checked
@@ -236,7 +219,6 @@ function ColumnFilterDropdown({
             flexDirection: "column",
           }}
         >
-          {/* Search */}
           <Input
             prefix={<IconSearch />}
             value={search}
@@ -247,7 +229,6 @@ function ColumnFilterDropdown({
             style={{ marginBottom: 6 }}
           />
 
-          {/* Select All / Clear All */}
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
             <Button size="small" theme="borderless" onClick={handleSelectAll}>
               Select All
@@ -257,7 +238,6 @@ function ColumnFilterDropdown({
             </Button>
           </div>
 
-          {/* Checkbox list */}
           <div style={{ flex: 1, overflow: "auto", maxHeight: 200 }}>
             {filteredValues.map((val) => (
               <div key={val} style={{ padding: "2px 0" }}>
@@ -282,7 +262,6 @@ function ColumnFilterDropdown({
             )}
           </div>
 
-          {/* Apply / done */}
           <div
             style={{ borderTop: "1px solid var(--semi-color-border)", paddingTop: 6, marginTop: 4 }}
           >
@@ -295,10 +274,6 @@ function ColumnFilterDropdown({
     </div>
   )
 }
-
-// ---------------------------------------------------------------------------
-// FilterSection — sidebar filter panel with Select All / Deselect All
-// ---------------------------------------------------------------------------
 
 function FilterSection({
   col,
@@ -354,7 +329,6 @@ function FilterSection({
         </Space>
       }
     >
-      {/* Select All / Clear All */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
         <Button
           size="small"
@@ -407,10 +381,6 @@ function FilterSection({
     </Collapse.Panel>
   )
 }
-
-// ---------------------------------------------------------------------------
-// ContextMenu — right-click actions for selected rows (with Semi icons)
-// ---------------------------------------------------------------------------
 
 interface ContextMenuState {
   visible: boolean
@@ -562,10 +532,6 @@ function RowContextMenu({
   )
 }
 
-// ---------------------------------------------------------------------------
-// SchedulePage
-// ---------------------------------------------------------------------------
-
 export function SchedulePage({ active = true }: Readonly<{ active?: boolean }> = {}) {
   const {
     payload,
@@ -588,7 +554,6 @@ export function SchedulePage({ active = true }: Readonly<{ active?: boolean }> =
   const [highlightEmpty, setHighlightEmpty] = useState(false)
   const [tableSearch, setTableSearch] = useState("")
 
-  // Context menu state
   const [contextMenu, setContextMenu] = useState<ContextMenuState>({
     visible: false,
     x: 0,
@@ -596,8 +561,6 @@ export function SchedulePage({ active = true }: Readonly<{ active?: boolean }> =
     showColorPicker: false,
   })
 
-  // Auto-sync Schedule filter/group state to Revit (color overrides + isolation)
-  // Pass first groupBy column for the sync hook
   useScheduleSync(active, filteredRows, groupByColumns[0])
 
   const selectedIdArray = useMemo(() => Array.from(selectedIds), [selectedIds])
@@ -610,12 +573,10 @@ export function SchedulePage({ active = true }: Readonly<{ active?: boolean }> =
     [filters],
   )
 
-  // Additional local search filter applied on top of global filteredRows
   const searchFilteredRows = useMemo(() => {
     if (!tableSearch.trim()) return filteredRows
     const needle = tableSearch.toLowerCase()
     return filteredRows.filter((row) => {
-      // Search across all string-valued columns
       for (const val of Object.values(row)) {
         if (typeof val === "string" && val.toLowerCase().includes(needle)) return true
         if (typeof val === "number" && String(val).includes(needle)) return true
@@ -746,12 +707,10 @@ export function SchedulePage({ active = true }: Readonly<{ active?: boolean }> =
     [bridge],
   )
 
-  // Handle row click for properties panel
   const handleRowClick = useCallback((record: ElementRow) => {
     window.dispatchEvent(new CustomEvent("dashboard-element-selected", { detail: record }))
   }, [])
 
-  // Context menu handler
   const handleContextMenu = useCallback(
     (e: React.MouseEvent) => {
       if (selectedIds.size === 0) return
@@ -770,7 +729,6 @@ export function SchedulePage({ active = true }: Readonly<{ active?: boolean }> =
     setContextMenu((prev) => ({ ...prev, visible: false }))
   }, [])
 
-  // Keyboard shortcuts for this page
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const isInput = document.activeElement?.tagName === "INPUT"
@@ -857,7 +815,6 @@ export function SchedulePage({ active = true }: Readonly<{ active?: boolean }> =
                 )}
               </Collapse>
 
-              {/* Audit section */}
               <div
                 style={{
                   marginTop: 12,
@@ -890,7 +847,6 @@ export function SchedulePage({ active = true }: Readonly<{ active?: boolean }> =
                 flexDirection: "column",
               }}
             >
-              {/* Chart filter banner */}
               {chartFilter && (
                 <Banner
                   type="warning"
@@ -914,7 +870,6 @@ export function SchedulePage({ active = true }: Readonly<{ active?: boolean }> =
                 />
               )}
 
-              {/* Table toolbar */}
               <Card
                 style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}
                 title={
@@ -933,7 +888,6 @@ export function SchedulePage({ active = true }: Readonly<{ active?: boolean }> =
                 }
                 headerExtraContent={
                   <Space>
-                    {/* Global search bar */}
                     <Input
                       prefix={<IconSearch />}
                       value={tableSearch}
@@ -1002,7 +956,6 @@ export function SchedulePage({ active = true }: Readonly<{ active?: boolean }> =
         </ResizeGroup>
       </div>
 
-      {/* Context menu for right-click actions */}
       <RowContextMenu
         state={contextMenu}
         onClose={closeContextMenu}

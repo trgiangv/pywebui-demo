@@ -1,8 +1,3 @@
-/**
- * Visual Inventory — Treemap + Family Explorer.
- * Replaces the boring Project Browser tree with visual data.
- */
-
 import { useCallback, useEffect } from "react"
 import { Space } from "@douyinfe/semi-ui"
 import { toast } from "@/lib/toast"
@@ -15,7 +10,6 @@ export function InventoryPage({ active = true }: Readonly<{ active?: boolean }> 
   const { filteredRows, setFilters } = useDashboard()
   const bridge = useBridge()
 
-  // Reset temporary view mode when leaving this page
   useEffect(() => {
     if (!active) return
     return () => {

@@ -1,7 +1,5 @@
 import type { EnvelopeKindName } from "@/lib/envelope"
 
-/** WebView2 ↔ host envelope. Both directions use this object. */
-
 export interface BridgeMessage {
   type: EnvelopeKindName
   command: string

@@ -1,8 +1,3 @@
-/**
- * Heavy Elements Tracker — Leaderboard of families with highest complexity.
- * Click a family row to isolate its elements in Revit.
- */
-
 import { Card, Progress, Space, Tag, Tooltip, Typography } from "@douyinfe/semi-ui"
 import { Eye } from "lucide-react"
 import type { HeavyFamily } from "@/types"
@@ -74,7 +69,6 @@ export function HeavyTracker({ families, onIsolateFamily }: Readonly<HeavyTracke
               }}
               title={`Click to isolate all "${f.family_name}" elements`}
             >
-              {/* Rank */}
               <Tag
                 size="small"
                 color={index < 3 ? "orange" : "grey"}
@@ -83,7 +77,6 @@ export function HeavyTracker({ families, onIsolateFamily }: Readonly<HeavyTracke
                 {getMedalEmoji(index)}
               </Tag>
 
-              {/* Family info + bar */}
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
                   <Text
@@ -115,12 +108,10 @@ export function HeavyTracker({ families, onIsolateFamily }: Readonly<HeavyTracke
                 </div>
               </div>
 
-              {/* Isolate icon */}
               <Tooltip content="Isolate in Revit">
                 <Eye size={14} style={{ color: "var(--semi-color-text-3)", opacity: 0.6 }} />
               </Tooltip>
 
-              {/* Complexity score */}
               <Text strong size="small" style={{ textAlign: "right", color }}>
                 {f.estimated_complexity.toLocaleString()}
               </Text>

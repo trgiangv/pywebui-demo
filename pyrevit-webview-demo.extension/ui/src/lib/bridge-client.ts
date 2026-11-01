@@ -1,13 +1,3 @@
-/**
- * Bridge client. One JSON envelope, three ways to carry it:
- *
- * - webview: chrome.webview.postMessage / `bim-bridge` CustomEvent (Revit WebView2 window)
- * - http:    POST /api/invoke + EventSource /api/events on a Revit session (page hosted elsewhere)
- * - mock:    in-page fake data (plain browser, no Revit)
- *
- * The constructor does not subscribe; call start() from a provider effect.
- */
-
 import type {
   BridgeMessage,
   ChromeWebView,
@@ -257,8 +247,8 @@ export class BridgeClient {
       })
       const body: unknown = await res.json().catch(() => null)
       if (res.ok) return this.onMessage(body)
-      const detail = (body as { error?: string } | null)?.error ?? `HTTP ${res.status}`
-      this.failPending(id, detail)
+      const detail = (body as { detail?: unknown } | null)?.detail
+      this.failPending(id, typeof detail === "string" ? detail : `HTTP ${res.status}`)
     } catch (error) {
       this.compatible = null // retry the handshake next time
       this.failPending(id, error instanceof Error ? error.message : "Request failed")

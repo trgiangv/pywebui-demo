@@ -1,8 +1,3 @@
-/**
- * Model Health & Hygiene — Warnings matrix + Heavy elements tracker.
- * Supports isolation, selection, and color override per warning/family.
- */
-
 import { useCallback, useEffect } from "react"
 import { Space } from "@douyinfe/semi-ui"
 import { toast } from "@/lib/toast"
@@ -19,7 +14,6 @@ export function HealthPage({ active = true }: Readonly<HealthPageProps>) {
   const { payload } = useDashboard()
   const bridge = useBridge()
 
-  // Cleanup: reset isolation when leaving the Health tab
   useEffect(() => {
     if (!active) {
       bridge.resetIsolation().catch(() => {})

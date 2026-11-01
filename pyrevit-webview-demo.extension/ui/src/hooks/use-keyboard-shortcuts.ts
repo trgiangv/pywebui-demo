@@ -1,7 +1,3 @@
-/**
- * Global keyboard shortcuts for the dashboard.
- */
-
 import { useEffect } from "react"
 import { toast } from "@/lib/toast"
 import { useBridge } from "@/providers/bridge-provider"

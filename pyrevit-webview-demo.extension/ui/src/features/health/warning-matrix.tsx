@@ -1,9 +1,3 @@
-/**
- * Warning Severity Matrix — classifies Revit warnings by severity.
- * Critical (red), Moderate (yellow), Info (green).
- * Features: per-row click-to-isolate, Select All, Color Override per severity.
- */
-
 import { useMemo, useState } from "react"
 import {
   Button,
@@ -70,7 +64,6 @@ export function WarningSeverityMatrix({
 
   const total = warnings.length
 
-  // Get all element IDs for a severity group
   const getElementIds = (severity: WarningItem["severity"]) => {
     const ids = new Set<string>()
     for (const w of grouped[severity]) {
@@ -91,7 +84,6 @@ export function WarningSeverityMatrix({
       headerStyle={{ padding: "12px 16px" }}
       bodyStyle={{ padding: "8px 16px 16px" }}
     >
-      {/* Summary bars */}
       <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
         {(["critical", "moderate", "info"] as const).map((sev) => {
           const config = SEVERITY_CONFIG[sev]
@@ -132,7 +124,6 @@ export function WarningSeverityMatrix({
         })}
       </div>
 
-      {/* Detail list */}
       <Collapse
         activeKey={expandedSeverity}
         onChange={(keys) => setExpandedSeverity(keys as string[])}
@@ -158,7 +149,6 @@ export function WarningSeverityMatrix({
               }
               extra={
                 <Space>
-                  {/* Select all elements for this severity */}
                   {onSelectElements && (
                     <Tooltip content={`Select all ${sevElementIds.length} elements`}>
                       <Button
@@ -172,7 +162,6 @@ export function WarningSeverityMatrix({
                       />
                     </Tooltip>
                   )}
-                  {/* Color override for all elements of this severity */}
                   {onColorOverride && (
                     <Tooltip content={`Color override (${config.label})`}>
                       <Button
@@ -196,7 +185,6 @@ export function WarningSeverityMatrix({
                       </Button>
                     </Tooltip>
                   )}
-                  {/* Isolate all elements for this severity */}
                   <Tooltip content="Isolate in Revit">
                     <Button
                       size="small"

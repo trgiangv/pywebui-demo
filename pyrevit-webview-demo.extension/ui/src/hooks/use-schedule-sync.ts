@@ -1,17 +1,3 @@
-/**
- * useScheduleSync — Debounced auto-sync of Schedule filter/group changes to Revit.
- *
- * When the Schedule tab is active, every change to filteredRows or groupBy
- * triggers a debounced call to `applyGroupOverrides` which:
- *   1. Resets the previous temp view mode
- *   2. Clears old graphic overrides
- *   3. Applies group-based color overrides
- *   4. Isolates the filtered set of elements
- *
- * On unmount (or when active becomes false), `resetScheduleMode` is called
- * to clean up all temporary view states and overrides.
- */
-
 import { useEffect, useRef } from "react"
 import { displayText } from "@/lib/text"
 import { useBridge } from "@/providers/bridge-provider"
@@ -26,7 +12,6 @@ export function useScheduleSync(
   const bridge = useBridge()
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-  // Cleanup: reset schedule mode when leaving the Schedule tab
   useEffect(() => {
     if (!active) return
     return () => {
@@ -34,7 +19,6 @@ export function useScheduleSync(
     }
   }, [active, bridge])
 
-  // When filteredRows or groupBy change: recompute groups & send overrides
   useEffect(() => {
     if (!active || filteredRows.length === 0) return
 
@@ -42,7 +26,6 @@ export function useScheduleSync(
     debounceRef.current = setTimeout(() => {
       const field = groupBy ?? "category"
 
-      // Build group map: label -> element ids
       const groupMap = new Map<string, string[]>()
       for (const row of filteredRows) {
         const key = displayText((row as Record<string, unknown>)[field], "Unknown")
@@ -57,7 +40,7 @@ export function useScheduleSync(
         groups.map((g) => ({ element_ids: g.ids, color: g.color })),
         filteredRows.map((r) => r.element_id),
       )
-    }, 300) // 300ms debounce to avoid hammering Revit on rapid filter changes
+    }, 300)
 
     return () => clearTimeout(debounceRef.current)
   }, [active, filteredRows, groupBy, bridge])

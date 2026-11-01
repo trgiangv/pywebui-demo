@@ -1,12 +1,4 @@
-/**
- * Binds this tab to one Revit session.
- *
- * The tool opens the page as `?port=<port>#token=<token>`. Several Revit sessions
- * can be running, each on its own port, so the pair identifies which one this tab
- * drives. The token travels in the fragment so the page host never sees it.
- */
-
-/** Must match `PROTOCOL` in `revit_dashboard/config.py`. */
+/** Must match `PROTOCOL` in `config.py` in the pushbutton `lib`. */
 export const SUPPORTED_PROTOCOL = 1
 
 export interface RevitSession {
@@ -29,7 +21,6 @@ function fromUrl(): RevitSession | null {
   return { base: `http://127.0.0.1:${port}`, token }
 }
 
-/** URL first (then removed from the address bar), else what this tab remembered. */
 export function readSession(): RevitSession | null {
   try {
     const fromAddress = fromUrl()
@@ -45,7 +36,6 @@ export function readSession(): RevitSession | null {
   }
 }
 
-/** Throws a readable error when Revit is unreachable or speaks another protocol. */
 export async function checkSession(session: RevitSession): Promise<void> {
   let health: Health
   try {

@@ -1,7 +1,3 @@
-/**
- * Excel export. The dashboard window shows its Save dialog and writes the file.
- */
-
 import ExcelJS from "exceljs"
 import type { DashboardFilterState, ElementRow, WarningItem } from "@/types"
 import { computeKpis } from "./analytics"

@@ -1,7 +1,3 @@
-/**
- * Session trend. ECharts draws the line, area, and axis tooltip.
- */
-
 import { useMemo } from "react"
 import type { EChartsCoreOption } from "echarts/core"
 import { EChart, tooltipBase, useChartColors } from "./echart"

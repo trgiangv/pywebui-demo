@@ -1,7 +1,3 @@
-/**
- * Header: breadcrumb, element count, and page actions.
- */
-
 import { Breadcrumb, Button, Nav, Space, Tag } from "@douyinfe/semi-ui"
 import { FileDown, Moon, Sun } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"

@@ -1,8 +1,3 @@
-/**
- * Session history — stores KPI snapshots in localStorage
- * for sparkline trend display across sessions.
- */
-
 import type { SessionSnapshot } from "@/types"
 
 const STORAGE_KEY = "bim-dashboard-session-history"
@@ -26,7 +21,6 @@ export function pushSessionSnapshot(kpis: Record<string, number>): void {
     kpis,
   })
 
-  // Keep only the most recent snapshots
   const trimmed = history.slice(-MAX_SNAPSHOTS)
 
   try {
@@ -36,10 +30,6 @@ export function pushSessionSnapshot(kpis: Record<string, number>): void {
   }
 }
 
-/**
- * Get sparkline data for a specific KPI key.
- * Returns an array of values from oldest to newest.
- */
 export function getSparklineData(kpiKey: string): number[] {
   const history = getSessionHistory()
   return history.map((s) => s.kpis[kpiKey] ?? 0)

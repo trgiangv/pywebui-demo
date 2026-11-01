@@ -1,8 +1,3 @@
-/**
- * Category or level donut. Hover and slice layout belong to ECharts.
- * Click reports the slice name so the dashboard can filter.
- */
-
 import { useMemo } from "react"
 import type { EChartsCoreOption } from "echarts/core"
 import { Card, Typography } from "@douyinfe/semi-ui"

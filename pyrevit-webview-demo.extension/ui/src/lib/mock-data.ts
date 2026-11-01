@@ -1,13 +1,5 @@
-/**
- * Mock data generator for browser development.
- *
- * Generates realistic BIM element data for testing the dashboard
- * without needing Revit connection.
- */
-
 import type { DashboardPayload, ElementRow, HeavyFamily, ModelInfo, WarningItem } from "@/types"
 
-// Sample data pools
 const CATEGORIES = [
   "Walls",
   "Floors",
@@ -71,7 +63,6 @@ const LEVELS = [
 const PHASES = ["Existing", "New Construction", "Demolition"]
 const WORKSETS = ["Shared Levels and Grids", "Workset1", "Architecture", "Structure", "MEP"]
 
-// Warning templates
 const WARNING_TEMPLATES: Array<{
   description: string
   severity: WarningItem["severity"]
@@ -145,7 +136,6 @@ const WARNING_TEMPLATES: Array<{
   },
 ]
 
-// Helper functions
 function randomUnit(): number {
   const values = new Uint32Array(1)
   crypto.getRandomValues(values)
@@ -168,7 +158,6 @@ function generateUniqueId(): string {
   return crypto.randomUUID()
 }
 
-// Generate a single element row
 function generateElement(id: string): ElementRow {
   const category = randomFrom(CATEGORIES)
   const familyOptions = FAMILIES[category] ?? ["Generic"]
@@ -193,7 +182,6 @@ function generateElement(id: string): ElementRow {
   }
 }
 
-// Generate multiple elements with realistic distribution
 function generateElements(count: number): ElementRow[] {
   const elements: ElementRow[] = []
   const usedIds = new Set<string>()
@@ -210,7 +198,6 @@ function generateElements(count: number): ElementRow[] {
   return elements
 }
 
-// Build filter options from elements
 function buildFilterOptions(elements: ElementRow[]): Record<string, string[]> {
   const options: Record<string, Set<string>> = {
     category: new Set(),
@@ -233,7 +220,6 @@ function buildFilterOptions(elements: ElementRow[]): Record<string, string[]> {
   return Object.fromEntries(Object.entries(options).map(([k, v]) => [k, Array.from(v).sort()]))
 }
 
-// Build chart data
 function buildChartData(elements: ElementRow[]): Record<string, Record<string, unknown>[]> {
   const countBy = (key: keyof ElementRow) => {
     const counts = new Map<string, number>()
@@ -266,7 +252,6 @@ function buildChartData(elements: ElementRow[]): Record<string, Record<string, u
   }
 }
 
-// Build KPIs
 function buildKpis(
   elements: ElementRow[],
   warnings: WarningItem[],
@@ -286,7 +271,6 @@ function buildKpis(
   }
 }
 
-// Generate mock warnings
 function generateWarnings(elements: ElementRow[]): WarningItem[] {
   const warningCount = randomInt(15, 60)
   const warnings: WarningItem[] = []
@@ -311,7 +295,6 @@ function generateWarnings(elements: ElementRow[]): WarningItem[] {
   return warnings
 }
 
-// Generate mock heavy families
 function generateHeavyFamilies(elements: ElementRow[]): HeavyFamily[] {
   const familyCounts = new Map<string, { category: string; count: number; types: Set<string> }>()
 
@@ -337,7 +320,6 @@ function generateHeavyFamilies(elements: ElementRow[]): HeavyFamily[] {
     .slice(0, 10)
 }
 
-// Generate mock model info
 function generateModelInfo(): ModelInfo {
   return {
     file_name: "Office_Building_2025.rvt",
@@ -348,10 +330,6 @@ function generateModelInfo(): ModelInfo {
   }
 }
 
-/**
- * Generate a complete mock dashboard payload.
- * @param elementCount Number of elements to generate (default: 2500)
- */
 export function generateMockPayload(elementCount = 2500): DashboardPayload {
   const elements = generateElements(elementCount)
   const filterOptions = buildFilterOptions(elements)
@@ -408,9 +386,6 @@ export function generateMockPayload(elementCount = 2500): DashboardPayload {
   }
 }
 
-/**
- * Check if running in browser (not in Revit WebView2)
- */
 export function isBrowserMode(): boolean {
   return !window.chrome?.webview && !window.__BIM_DASHBOARD_INITIAL_DATA
 }

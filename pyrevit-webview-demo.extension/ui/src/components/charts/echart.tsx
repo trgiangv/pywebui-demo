@@ -1,7 +1,3 @@
-/**
- * Shared ECharts host. Charts register only the series they render.
- */
-
 import { useEffect, useMemo, useRef } from "react"
 import { init, use, type ECharts, type EChartsCoreOption } from "echarts/core"
 import { LineChart, PieChart, TreemapChart } from "echarts/charts"

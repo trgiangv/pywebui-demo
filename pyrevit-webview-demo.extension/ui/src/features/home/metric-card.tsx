@@ -1,7 +1,3 @@
-/**
- * KPI card. The number is a Semi title. The trend line is ECharts.
- */
-
 import { Card, Typography } from "@douyinfe/semi-ui"
 import { Sparkline } from "@/components/charts/sparkline"
 

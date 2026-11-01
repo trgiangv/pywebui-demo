@@ -1,7 +1,3 @@
-/**
- * Pure filter functions — no side effects, no component state.
- */
-
 import type { DashboardFilterState, ElementRow } from "@/types"
 
 export function applyFilters(rows: ElementRow[], filters: DashboardFilterState): ElementRow[] {
@@ -34,7 +30,6 @@ function matchesSearch(row: ElementRow, search: string): boolean {
   return hay.includes(search)
 }
 
-/** Format column key to display label: "element_id" → "Element Id" */
 export function formatColumnHeader(key: string): string {
   return key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
 }

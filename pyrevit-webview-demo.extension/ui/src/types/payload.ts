@@ -1,5 +1,3 @@
-/** Types mirroring the Python DashboardPayload contract. */
-
 export interface ElementRow {
   element_id: string
   unique_id: string
@@ -14,7 +12,7 @@ export interface ElementRow {
   is_view_specific: boolean
   is_pinned: boolean
   has_material_quantities: boolean
-  [key: string]: unknown // allow dynamic columns
+  [key: string]: unknown
 }
 
 export interface ChartConfig {
@@ -51,7 +49,6 @@ export interface WarningItem {
   category: string
 }
 
-/** GetSnapshot / injected host payload before client analytics. */
 export interface HostSnapshot {
   model_info: ModelInfo
   rows: Array<Partial<ElementRow> & Record<string, unknown>>
@@ -94,7 +91,6 @@ export interface DashboardFilterState {
   hide_levels?: string[]
 }
 
-/** Session KPI snapshot for sparkline history */
 export interface SessionSnapshot {
   timestamp: string
   kpis: Record<string, number>

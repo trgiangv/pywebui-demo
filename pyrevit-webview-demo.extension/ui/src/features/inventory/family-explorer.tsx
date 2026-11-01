@@ -1,8 +1,3 @@
-/**
- * Family and type explorer.
- * Search is a Semi Input. Each family is a grid List item.
- */
-
 import { useMemo, useState } from "react"
 import { Card, Descriptions, Empty, Input, List, Space, Tag, Typography } from "@douyinfe/semi-ui"
 import { IconSearch } from "@douyinfe/semi-icons"

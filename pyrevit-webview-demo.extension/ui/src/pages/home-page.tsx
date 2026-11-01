@@ -1,8 +1,3 @@
-/**
- * Project Pulse — Home page.
- * KPI "Big Numbers" cards + Category/Level Donut charts + Quick overview cards.
- */
-
 import { useMemo, useCallback } from "react"
 import { displayText } from "@/lib/text"
 import { Banner, Button, Card, Col, Progress, Row, Space, Tag, Typography } from "@douyinfe/semi-ui"
@@ -51,7 +46,6 @@ export function HomePage({ onNavigate }: Readonly<HomePageProps>) {
     [payload],
   )
 
-  // Warning summary by severity
   const warningSummary = useMemo(() => {
     const warnings = payload?.warnings ?? []
     return {
@@ -61,7 +55,6 @@ export function HomePage({ onNavigate }: Readonly<HomePageProps>) {
     }
   }, [payload])
 
-  // Top 5 families by instance count
   const topFamilies = useMemo(() => {
     const counts = new Map<string, { count: number; category: string }>()
     for (const row of filteredRows) {
@@ -78,7 +71,6 @@ export function HomePage({ onNavigate }: Readonly<HomePageProps>) {
       .slice(0, 5)
   }, [filteredRows])
 
-  // Data quality score
   const dataQuality = useMemo(() => {
     if (filteredRows.length === 0) return { score: 100, filled: 0, total: 0 }
     const checkFields = ["category", "family", "type", "level"]
