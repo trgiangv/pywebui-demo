@@ -48,7 +48,7 @@ of many seconds. The launcher calls `pywebui.embed`, which loads pyRevit's pytho
 DLL and initializes the `CPY312` interpreter itself with `BeginAllowThreads`; the dashboard
 code then runs inside it and its threads keep running after the click.
 
-The transports come from the [pyWebUI](https://github.com/trgiangv/pywebui) lib (`pywebui.webview`, `pywebui.http`) and only move envelopes. Commands are registered on a `pywebui.Bridge`. `service.py` and everything below it never
+The transports come from the [pywebui](https://github.com/trgiangv/pywebui) lib (`pywebui.webview`, `pywebui.http`) and only move envelopes. Commands are registered on a `pywebui.Bridge`. `service.py` and everything below it never
 know which transport asked. `mock` is used when the page runs in a plain
 browser with no Revit.
 
@@ -159,12 +159,12 @@ The repo root is the extension. pyRevit loads it as `pywebui-demo.extension`.
 
 ## Setup (once)
 
-1. `pyrevit extend lib pyWebUI https://github.com/trgiangv/pywebui.git`
+1. `pyrevit extend lib pywebui https://github.com/trgiangv/pywebui.git`
 2. `pyrevit extend ui pywebui-demo https://github.com/trgiangv/pywebui-demo.git`, then reload pyRevit. To work on the source, clone into a folder named `pywebui-demo.extension` and run `pyrevit extensions paths add <its parent folder>`.
 3. `cd ui && vp install`
 4. For the editor: `pixi install`, then use `.pixi/envs/default/python.exe` as the interpreter.
 
-Both choices run in the pyRevit `CPY312` engine. On pyRevit, `startup.py` (IronPython) checks it at load on a background thread. `pywebui.runtime.HTTP_REQUIREMENTS` (PEP 508 strings, the PEP 723 dependency form: `fastapi>=0.162.0`, `uvicorn>=0.54.0` and `packaging>=26.3`) must be installed, satisfy their specifiers and import. If any is missing, outside its specifier or broken, it installs them again with `pip install --target` into a staging folder and swaps it into `%LOCALAPPDATA%\pyWebUI\packages\pywebui\cp312` only after the check passes, so the engine's own `site-packages`, shared with other extensions, is never touched. The result is in the pyRevit log. `lib/config.py` (`embed_paths`) finds pyRevit's `pyRevitLabs.PythonNet.dll` (`netcore` on Revit 2025+, `netfx` before), the engine folder and `python312.dll`, and puts the button folder, `pyWebUI.lib` and that packages folder on the embedded interpreter's `sys.path`.
+Both choices run in the pyRevit `CPY312` engine. On pyRevit, `startup.py` (IronPython) checks it at load on a background thread. `pywebui.runtime.HTTP_REQUIREMENTS` (PEP 508 strings, the PEP 723 dependency form: `fastapi>=0.162.0`, `uvicorn>=0.54.0` and `packaging>=26.3`) must be installed, satisfy their specifiers and import. If any is missing, outside its specifier or broken, it installs them again with `pip install --target` into a staging folder and swaps it into `%LOCALAPPDATA%\pywebui\packages\pywebui\cp312` only after the check passes, so the engine's own `site-packages`, shared with other extensions, is never touched. The result is in the pyRevit log. `lib/config.py` (`embed_paths`) finds pyRevit's `pyRevitLabs.PythonNet.dll` (`netcore` on Revit 2025+, `netfx` before), the engine folder and `python312.dll`, and puts the button folder, `pywebui.lib` and that packages folder on the embedded interpreter's `sys.path`.
 
 `pyproject.toml` sets up the same Python and packages with pixi for the editor.
 

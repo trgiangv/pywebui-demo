@@ -4,7 +4,7 @@ import sys
 
 from Autodesk.Revit import UI
 
-# sys.path.append(os.path.join(os.environ["APPDATA"], "pyRevit", "Extensions", "pyWebUI.lib"))
+# sys.path.append(os.path.join(os.environ["APPDATA"], "pyRevit", "Extensions", "pywebui.lib"))
 
 from lib import config  # noqa: E402
 from pywebui import embed  # noqa: E402

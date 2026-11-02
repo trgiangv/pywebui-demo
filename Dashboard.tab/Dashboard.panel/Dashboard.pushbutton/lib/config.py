@@ -26,7 +26,7 @@ EMBEDDED_REFERENCES = (
     "PresentationCore",
     "PresentationFramework",
 )
-PYWEBUI_LIB_DIR = os.path.join(os.environ["APPDATA"], "pyRevit", "Extensions", "pyWebUI.lib")
+PYWEBUI_LIB_DIR = os.path.join(os.environ["APPDATA"], "pyRevit", "Extensions", "pywebui.lib")
 
 
 def site():
